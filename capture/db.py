@@ -15,19 +15,22 @@ db = SqliteDatabase("capture.db")
 
 
 @contextmanager
-def database_context():
+def database_context(database: SqliteDatabase = db):
     try:
-        db.connect()
-        db.create_tables([RawAudio, AudioTranscription])
-        yield db
+        database.connect()
+        database.bind(
+            [RawAudio, AudioTranscription], bind_refs=False, bind_backrefs=False
+        )
+        database.create_tables([RawAudio, AudioTranscription])
+        yield database
     finally:
-        if not db.is_closed():
-            db.close()
+        if not database.is_closed():
+            database.close()
 
 
 class BaseModel(Model):
     class Meta:
-        database = db
+        database = None
 
 
 class RawAudio(BaseModel):
