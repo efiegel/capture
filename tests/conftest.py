@@ -3,7 +3,7 @@ from peewee import SqliteDatabase
 
 from capture.db import all_models, database_context
 
-test_db = SqliteDatabase("capture_test.db")
+test_db = SqliteDatabase(":memory:")
 
 
 @pytest.fixture(scope="session", autouse=True)
