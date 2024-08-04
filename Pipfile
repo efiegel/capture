@@ -9,6 +9,7 @@ ruff = "*"
 
 [packages]
 openai-whisper = "*"
+peewee = "*"
 
 [requires]
 python_version = "3.11"
