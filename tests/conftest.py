@@ -1,7 +1,7 @@
 import pytest
 from peewee import SqliteDatabase
 
-from capture.db import AudioTranscription, RawAudio, database_context
+from capture.db import all_models, database_context
 
 test_db = SqliteDatabase("capture_test.db")
 
@@ -12,5 +12,5 @@ def db():
         yield test_db
 
     test_db.connect()
-    test_db.drop_tables([RawAudio, AudioTranscription])
+    test_db.drop_tables(all_models)
     test_db.close()

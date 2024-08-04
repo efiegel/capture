@@ -18,10 +18,8 @@ db = SqliteDatabase("capture.db")
 def database_context(database: SqliteDatabase = db):
     try:
         database.connect()
-        database.bind(
-            [RawAudio, AudioTranscription], bind_refs=False, bind_backrefs=False
-        )
-        database.create_tables([RawAudio, AudioTranscription])
+        database.bind(all_models, bind_refs=False, bind_backrefs=False)
+        database.create_tables(all_models)
         yield database
     finally:
         if not database.is_closed():
@@ -44,3 +42,6 @@ class AudioTranscription(BaseModel):
     model = CharField()
     transcription_time_seconds = IntegerField()
     created_at = DateTimeField(default=datetime.now)
+
+
+all_models = [RawAudio, AudioTranscription]
