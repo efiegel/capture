@@ -1,5 +1,4 @@
 from time import time
-from uuid import uuid4
 
 import whisper
 
@@ -11,16 +10,15 @@ class Audio:
         self.model_size = model_size
         self.model = whisper.load_model(model_size)
 
-    def transcribe(self, filepath: str) -> str:
-        raw_audio = RawAudio.create(file_path=filepath)
+    def transcribe(self, audio_file_path: str, transcription_file_path: str) -> str:
+        raw_audio = RawAudio.create(file_path=audio_file_path)
         raw_audio.save()
 
         start = time()
-        model_transcription = self.model.transcribe(filepath)
+        model_transcription = self.model.transcribe(audio_file_path)
         end = time()
 
         transcription_text = model_transcription["text"]
-        transcription_file_path = f"{uuid4()}.txt"
         with open(transcription_file_path, "w") as f:
             f.write(transcription_text)
 
