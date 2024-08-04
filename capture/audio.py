@@ -11,8 +11,9 @@ class Audio:
         self.model = whisper.load_model(model_size)
 
     def transcribe(self, audio_file_path: str, transcription_file_path: str) -> str:
-        raw_audio = RawAudio.create(file_path=audio_file_path)
-        raw_audio.save()
+        if (raw_audio := RawAudio.get_or_none(file_path=audio_file_path)) is None:
+            raw_audio = RawAudio.create(file_path=audio_file_path)
+            raw_audio.save()
 
         start = time()
         model_transcription = self.model.transcribe(audio_file_path)
