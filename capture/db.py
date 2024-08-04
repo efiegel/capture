@@ -1,6 +1,5 @@
 from contextlib import contextmanager
 from datetime import datetime
-from uuid import uuid4
 
 from peewee import (
     CharField,
@@ -37,7 +36,7 @@ class RawAudio(BaseModel):
 
 
 class AudioTranscription(BaseModel):
-    file_path = CharField(primary_key=True, default=lambda: str(uuid4()))
+    file_path = CharField(primary_key=True)
     raw_audio = ForeignKeyField(RawAudio, backref="transcriptions")
     model = CharField()
     transcription_time_seconds = IntegerField()
