@@ -2,7 +2,7 @@ from capture.db import RawAudio
 
 
 class TestDB:
-    def test_raw_audio_model(self, db):
+    def test_raw_audio_model(self):
         file_path = "test_file_path"
         raw_audio = RawAudio.create(file_path=file_path)
         raw_audio.save()
