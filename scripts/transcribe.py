@@ -14,16 +14,23 @@ RAW_AUDIO_DIRECTORY = os.path.expanduser(
 TRANSCRIPTION_DIRECTORY = "data/audio/transcriptions"
 
 
+def transcribe(file):
+    with database_context():
+        file_name = os.path.basename(file)
+        transcriber = Audio("tiny")
+        transcriber.transcribe(file, f"{TRANSCRIPTION_DIRECTORY}/{file_name}.txt")
+
+
 class M4AFileHandler(FileSystemEventHandler):
+    def __init__(self, on_created_callback) -> None:
+        super().__init__()
+        self.on_created_callback = on_created_callback
+
     def on_created(self, event):
-        if event.src_path.endswith(".m4a"):
-            file_name = os.path.basename(event.src_path)
-            if self.is_file_ready(event.src_path):
-                with database_context():
-                    transcriber = Audio("tiny")
-                    transcriber.transcribe(
-                        event.src_path, f"{TRANSCRIPTION_DIRECTORY}/{file_name}.txt"
-                    )
+        file = event.src_path
+        if file.endswith(".m4a"):
+            if self.is_file_ready(file):
+                self.on_created_callback(file)
 
     def is_file_ready(self, file_path, wait_time=2, max_attempts=20):
         previous_size = -1
@@ -48,7 +55,7 @@ class M4AFileHandler(FileSystemEventHandler):
 
 
 if __name__ == "__main__":
-    event_handler = M4AFileHandler()
+    event_handler = M4AFileHandler(transcribe)
     observer = Observer()
     observer.schedule(event_handler, path=RAW_AUDIO_DIRECTORY, recursive=False)
     observer.start()
