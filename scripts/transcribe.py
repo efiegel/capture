@@ -7,9 +7,7 @@ from capture.audio import Audio
 from capture.db import database_context
 from capture.event_handlers import M4AFileHandler
 
-RAW_AUDIO_DIRECTORY = os.path.expanduser(
-    "~/Library/Application Support/com.apple.voicememos/Recordings"
-)
+RAW_AUDIO_DIRECTORY = "data/audio/raw"
 TRANSCRIPTION_DIRECTORY = "data/audio/transcriptions"
 
 
