@@ -10,6 +10,8 @@ ruff = "*"
 [packages]
 openai-whisper = "*"
 peewee = "*"
+watchdog = "*"
+python-dotenv = "*"
 
 [requires]
 python_version = "3.11"

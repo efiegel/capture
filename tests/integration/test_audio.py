@@ -1,6 +1,7 @@
 import pytest
 
 from capture.audio import Audio
+from capture.db import RawAudio
 
 
 class TestAudio:
@@ -10,9 +11,23 @@ class TestAudio:
 
     def test_transcribe(self, transcriber):
         audio_sample_filepath = "tests/sample_data/audio/audio_sample_1.wav"
-        transcription = transcriber.transcribe(audio_sample_filepath)
+        transcription_file_path = "tests/sample_data/audio/transcription_sample_1.txt"
+        transcription = transcriber.transcribe(
+            audio_sample_filepath, transcription_file_path
+        )
         assert (
             transcription["text"]
             .lstrip()
             .startswith("The boy was there when the sun rose.")
+        )
+
+    def test_transcribe_does_not_reingest_existing_raw(self, transcriber):
+        audio_filepath = "tests/sample_data/audio/audio_sample_1.wav"
+        RawAudio.create(file_path=audio_filepath).save()
+
+        transcription_file_path = "tests/sample_data/audio/transcription_sample_1.txt"
+        transcriber.transcribe(audio_filepath, transcription_file_path)
+
+        assert (
+            RawAudio.select().where(RawAudio.file_path == audio_filepath).count() == 1
         )
