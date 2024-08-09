@@ -1,14 +1,17 @@
 import os
 import time
 
+from dotenv import load_dotenv
 from watchdog.observers import Observer
 
 from capture.audio import Audio
 from capture.db import database_context
 from capture.event_handlers import M4AFileHandler
 
-RAW_AUDIO_DIRECTORY = "data/audio/raw"
-TRANSCRIPTION_DIRECTORY = "data/audio/transcriptions"
+load_dotenv()
+
+RAW_AUDIO_DIRECTORY = os.getenv("RAW_AUDIO_DIRECTORY")
+TRANSCRIPTION_DIRECTORY = os.getenv("TRANSCRIPTION_DIRECTORY")
 
 
 def transcribe(file):

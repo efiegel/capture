@@ -2,14 +2,15 @@ import os
 import shutil
 import time
 
+from dotenv import load_dotenv
 from watchdog.observers import Observer
 
 from capture.event_handlers import M4AFileHandler
 
-SOURCE_AUDIO_DIRECTORY = os.path.expanduser(
-    "~/Library/Application Support/com.apple.voicememos/Recordings"
-)
-RAW_AUDIO_DIRECTORY = "data/audio/raw"
+load_dotenv()
+
+SOURCE_AUDIO_DIRECTORY = os.path.expanduser(os.getenv("SOURCE_AUDIO_DIRECTORY"))
+RAW_AUDIO_DIRECTORY = os.getenv("RAW_AUDIO_DIRECTORY")
 
 
 def copy(file):
