@@ -1,6 +1,6 @@
 #!/bin/bash
 
-scripts=("sync" "transcribe")
+scripts=("sync" "transcribe insert_note")
 for script in "${scripts[@]}"; do
     python -m "scripts.$script" &
 done
