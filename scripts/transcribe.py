@@ -19,7 +19,7 @@ def transcribe(file):
 
 
 if __name__ == "__main__":
-    event_handler = M4AFileHandler(transcribe)
+    event_handler = M4AFileHandler(transcribe, 0)
     observer = Observer()
     observer.schedule(event_handler, path=RAW_AUDIO_DIRECTORY, recursive=False)
     observer.start()

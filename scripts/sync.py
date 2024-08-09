@@ -20,7 +20,8 @@ def copy(file):
 
 
 if __name__ == "__main__":
-    event_handler = M4AFileHandler(copy)
+    max_recording_duration_seconds = 60 * 5  # 5 minutes
+    event_handler = M4AFileHandler(copy, max_recording_duration_seconds)
     observer = Observer()
     observer.schedule(event_handler, path=SOURCE_AUDIO_DIRECTORY, recursive=False)
     observer.start()
