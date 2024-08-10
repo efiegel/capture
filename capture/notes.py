@@ -1,6 +1,8 @@
 import os
 from datetime import datetime
 
+from capture.generator import Generator
+
 
 class Notes:
     def __init__(self, notes_directory: str) -> None:
@@ -13,8 +15,15 @@ class Notes:
             self.write("", file_path)
         return file_path
 
-    def update_note(self, file_path, content):
-        self.write(content, file_path)
+    def update_note(self, file_path, new_content):
+        with open(file_path, "r") as f:
+            existing_content = f.read()
+
+        content_generator = Generator()
+        updated_content = content_generator.integrate_content(
+            existing_content, new_content
+        )
+        self.write(updated_content, file_path)
 
     def write(self, content: str, note_path: str):
         with open(note_path, "w") as f:
