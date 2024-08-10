@@ -14,7 +14,7 @@ class Notes:
         return file_path
 
     def update_note(self, file_path, content):
-        pass
+        self.write(content, file_path)
 
     def write(self, content: str, note_path: str):
         with open(note_path, "w") as f:
@@ -24,7 +24,5 @@ class Notes:
         with open(text_file_path, "r") as f:
             content = f.read()
 
-        file_name = os.path.basename(text_file_path)
-        note_file_name = file_name.replace(".txt", ".md")
-        note_path = f"{self.notes_directory}/{note_file_name}"
-        self.write(content, note_path)
+        daily_note = self.get_or_create_daily_note()
+        self.update_note(daily_note, content)
