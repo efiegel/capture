@@ -14,11 +14,8 @@ NOTES_DIRECTORY = os.getenv("NOTES_DIRECTORY")
 
 
 def create_note(file):
-    file_name = os.path.basename(file)
-    note_path = os.path.expanduser(f"{NOTES_DIRECTORY}/{file_name}.md")
-
-    notes = Notes()
-    notes.insert(file, note_path)
+    notes = Notes(os.path.expanduser(NOTES_DIRECTORY))
+    notes.create_from_text_file(file)
 
 
 if __name__ == "__main__":
