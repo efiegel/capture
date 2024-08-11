@@ -13,13 +13,13 @@ FILE_DIRECTORY = os.getenv("TRANSCRIPTION_DIRECTORY")
 NOTES_DIRECTORY = os.getenv("NOTES_DIRECTORY")
 
 
-def create_note(file):
+def add_content(file):
     notes = Notes(os.path.expanduser(NOTES_DIRECTORY))
-    notes.create_from_text_file(file)
+    notes.add_content(file)
 
 
 if __name__ == "__main__":
-    event_handler = TextFileHandler(create_note)
+    event_handler = TextFileHandler(add_content)
     observer = Observer()
     observer.schedule(event_handler, path=FILE_DIRECTORY, recursive=False)
     observer.start()

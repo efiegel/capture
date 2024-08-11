@@ -12,6 +12,7 @@ openai-whisper = "*"
 peewee = "*"
 watchdog = "*"
 python-dotenv = "*"
+openai = "*"
 
 [requires]
 python_version = "3.11"

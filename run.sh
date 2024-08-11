@@ -1,6 +1,13 @@
 #!/bin/bash
 
-scripts=("sync" "transcribe insert_note")
+cleanup() {
+    pkill -P $$
+    exit 0
+}
+
+trap cleanup SIGINT
+
+scripts=("sync" "transcribe" "update_notes")
 for script in "${scripts[@]}"; do
     python -m "scripts.$script" &
 done
