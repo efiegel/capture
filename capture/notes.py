@@ -10,7 +10,7 @@ class Notes:
 
     def get_or_create_daily_note(self) -> str:
         file_name = f"{datetime.now().strftime('%Y-%m-%d')}.md"
-        file_path = f"{self.notes_directory}/{file_name}"
+        file_path = os.path.join(self.notes_directory, "daily_notes", file_name)
         if not os.path.exists(file_path):
             self.write("", file_path)
         return file_path
