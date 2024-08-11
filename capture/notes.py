@@ -4,11 +4,7 @@ import os
 from datetime import datetime
 from enum import Enum
 
-from dotenv import load_dotenv
-
 from capture.generator import Generator
-
-load_dotenv()
 
 
 class NoteType(str, Enum):
@@ -18,8 +14,9 @@ class NoteType(str, Enum):
 
 
 class Notes:
-    def __init__(self, notes_directory: str) -> None:
+    def __init__(self, notes_directory: str, food_log_path: str) -> None:
         self.notes_directory = notes_directory
+        self.food_log_path = food_log_path
         self.content_generator = Generator()
 
     def get_or_create_daily_note(self) -> str:
@@ -48,12 +45,9 @@ class Notes:
 
     def add_content_to_food_log(self, content: str):
         # TODO: decouple log from csv dependency
-        food_log_path = os.path.expanduser(
-            os.path.join(self.notes_directory, os.getenv("FOOD_LOG_PATH"))
-        )
         parsed_entries = self.content_generator.parse_food_log_entries(content)
         entries = json.loads(parsed_entries).get("entries", [])  # TODO: fix output
-        with open(food_log_path, mode="a", newline="") as file:
+        with open(self.food_log_path, mode="a", newline="") as file:
             writer = csv.writer(file)
             for entry in entries:
                 entry["time"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")

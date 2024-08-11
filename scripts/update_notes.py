@@ -11,10 +11,13 @@ load_dotenv()
 
 FILE_DIRECTORY = os.getenv("TRANSCRIPTION_DIRECTORY")
 NOTES_DIRECTORY = os.getenv("NOTES_DIRECTORY")
+FOOD_LOG_PATH = os.getenv("FOOD_LOG_PATH")
 
 
 def add_content(file):
-    notes = Notes(os.path.expanduser(NOTES_DIRECTORY))
+    notes = Notes(
+        os.path.expanduser(NOTES_DIRECTORY), os.path.expanduser(FOOD_LOG_PATH)
+    )
     notes.add_content(file)
 
 
