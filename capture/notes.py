@@ -1,12 +1,19 @@
+import csv
+import json
 import os
 from datetime import datetime
 from enum import Enum
 
+from dotenv import load_dotenv
+
 from capture.generator import Generator
+
+load_dotenv()
 
 
 class NoteType(str, Enum):
     DAILY = "daily"
+    FOOD_LOG = "food_log"
     OTHER = "other"
 
 
@@ -39,9 +46,22 @@ class Notes:
         daily_note = self.get_or_create_daily_note()
         self.update_note(daily_note, content)
 
+    def add_content_to_food_log(self, content: str):
+        # TODO: decouple log from csv dependency
+        food_log_path = os.path.expanduser(
+            os.path.join(self.notes_directory, os.getenv("FOOD_LOG_PATH"))
+        )
+        parsed_entries = self.content_generator.parse_food_log_entries(content)
+        entries = json.loads(parsed_entries).get("entries", [])  # TODO: fix output
+        with open(food_log_path, mode="a", newline="") as file:
+            writer = csv.writer(file)
+            for entry in entries:
+                entry["time"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                writer.writerow(list(entry.values()))
+
     def get_note_type(self, content: str) -> NoteType:
         return self.content_generator.choose_category(
-            content, [NoteType.DAILY, NoteType.OTHER]
+            content, [NoteType.FOOD_LOG, NoteType.OTHER]
         )
 
     def add_content(self, text_file_path: str):
@@ -51,5 +71,7 @@ class Notes:
         match self.get_note_type(content):
             case NoteType.DAILY:
                 self.add_content_to_daily_note(content)
+            case NoteType.FOOD_LOG:
+                self.add_content_to_food_log(content)
             case _:
                 self.add_content_to_daily_note(content)

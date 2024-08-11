@@ -35,6 +35,34 @@ class Generator:
         )
         return response.choices[0].message.content
 
+    # TODO: genericize this or structure output
+    def parse_food_log_entries(self, content: str):
+        system_message = """
+        You are an expert at parsing food log entries. You will be provided with a text
+        snippet and you will need to parse out the relevant information. There may be 
+        multiple food entries in the text or there may only be one. Return a stringified
+        json object that's a list of entries. Each entry has the following keys: 'time', 
+        'name', 'qty', and 'unit'. If date isn't set, choose today's date. If other 
+        information isn't provided, set the value to null. The stringified json object
+        should be serializable into a list of python dicts with json.loads(), i.e. it 
+        should be valid json and not have newlines or extra spaces.
+        """
+
+        response = self.client.chat.completions.create(
+            model=self.model,
+            messages=[
+                {
+                    "role": "system",
+                    "content": system_message,
+                },
+                {
+                    "role": "user",
+                    "content": content,
+                },
+            ],
+        )
+        return response.choices[0].message.content
+
     def integrate_content(self, existing_content: str, new_content: str):
         system_message = """
         You are an expert at writing markdown and note-taking. You will be provided with
