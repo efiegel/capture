@@ -7,11 +7,13 @@ from capture.generator import Generator
 
 class NoteType(str, Enum):
     DAILY = "daily"
+    OTHER = "other"
 
 
 class Notes:
     def __init__(self, notes_directory: str) -> None:
         self.notes_directory = notes_directory
+        self.content_generator = Generator()
 
     def get_or_create_daily_note(self) -> str:
         file_name = f"{datetime.now().strftime('%Y-%m-%d')}.md"
@@ -24,8 +26,7 @@ class Notes:
         with open(file_path, "r") as f:
             existing_content = f.read()
 
-        content_generator = Generator()
-        updated_content = content_generator.integrate_content(
+        updated_content = self.content_generator.integrate_content(
             existing_content, new_content
         )
         self.write(updated_content, file_path)
@@ -39,7 +40,9 @@ class Notes:
         self.update_note(daily_note, content)
 
     def get_note_type(self, content: str) -> NoteType:
-        return NoteType.DAILY
+        return self.content_generator.choose_category(
+            content, [NoteType.DAILY, NoteType.OTHER]
+        )
 
     def add_content(self, text_file_path: str):
         with open(text_file_path, "r") as f:
@@ -49,4 +52,4 @@ class Notes:
             case NoteType.DAILY:
                 self.add_content_to_daily_note(content)
             case _:
-                pass  # default might eventually go to daily note or raise an error
+                self.add_content_to_daily_note(content)

@@ -11,6 +11,30 @@ class Generator:
         self.client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
         self.model = "gpt-4o-mini"
 
+    def choose_category(self, content: str, categories: list[str]):
+        system_message = """
+        You are an expert at categorizing content. You will be provided with a sample
+        of text and a list of categories. Your task is to choose the category that best
+        fits the text. Return only the name of the category.
+        """
+
+        user_message = f"Sample: '{content}'. : '{categories}'."
+
+        response = self.client.chat.completions.create(
+            model=self.model,
+            messages=[
+                {
+                    "role": "system",
+                    "content": system_message,
+                },
+                {
+                    "role": "user",
+                    "content": user_message,
+                },
+            ],
+        )
+        return response.choices[0].message.content
+
     def integrate_content(self, existing_content: str, new_content: str):
         system_message = """
         You are an expert at writing markdown and note-taking. You will be provided with
