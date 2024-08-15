@@ -1,9 +1,8 @@
-import csv
 import os
 from datetime import datetime
 from enum import Enum
 
-from capture.food_log import FoodLogEntries
+from capture.food_log import FoodLog, FoodLogEntries
 from capture.generator import Generator
 
 
@@ -44,12 +43,9 @@ class Notes:
         self.update_note(daily_note, content)
 
     def add_content_to_food_log(self, content: str):
-        # TODO: decouple log from csv dependency
         entries = self.content_generator.parse_food_log_entries(content, FoodLogEntries)
-        with open(self.food_log_path, mode="a", newline="") as file:
-            writer = csv.writer(file)
-            for entry in entries:
-                writer.writerow(list(entry.values()))
+        log = FoodLog(self.food_log_path)
+        log.add_entries(entries)
 
     def get_note_type(self, content: str) -> NoteType:
         return self.content_generator.choose_category(
