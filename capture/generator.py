@@ -1,22 +1,13 @@
+import json
 import os
 from datetime import datetime
 
 from dotenv import load_dotenv
 from openai import OpenAI
-from pydantic import BaseModel
+
+from capture.notes.food_log import FoodLogEntries
 
 load_dotenv()
-
-
-class FoodEntry(BaseModel):
-    time: str
-    name: str
-    qty: float
-    unit: str
-
-
-class Entries(BaseModel):
-    entries: list[FoodEntry]
 
 
 class Generator:
@@ -48,7 +39,7 @@ class Generator:
         )
         return response.choices[0].message.content
 
-    def parse_food_log_entries(self, content: str):
+    def parse_food_log_entries(self, content: str, response_format: FoodLogEntries):
         system_message = f"""
         You are an expert at parsing food log entries. You will be provided with a text
         snippet and you will need to parse out the relevant information. When parsing 
@@ -68,9 +59,9 @@ class Generator:
                     "content": content,
                 },
             ],
-            response_format=Entries,
+            response_format=response_format,
         )
-        return response.choices[0].message.content
+        return json.loads(response.choices[0].message.content)["entries"]
 
     def integrate_content(self, existing_content: str, new_content: str):
         system_message = """
