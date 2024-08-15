@@ -1,19 +1,16 @@
 import json
-import os
 from datetime import datetime
 
-from dotenv import load_dotenv
 from openai import OpenAI
 from pydantic import BaseModel
 
+from capture import settings
 from capture.notes.food_log import FoodLogEntry
-
-load_dotenv()
 
 
 class ContentGenerator:
     def __init__(self):
-        self.client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+        self.client = OpenAI(api_key=settings.OPENAI_API_KEY)
         self.model = "gpt-4o-mini"
 
     def choose_category(self, content: str, categories: list[str]):
