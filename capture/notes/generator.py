@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 from openai import OpenAI
 from pydantic import BaseModel
 
-from capture.food_log import FoodLogEntry
+from capture.notes.food_log import FoodLogEntry
 
 load_dotenv()
 

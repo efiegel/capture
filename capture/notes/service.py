@@ -2,8 +2,8 @@ import os
 from datetime import datetime
 from enum import Enum
 
-from capture.food_log import FoodLog
-from capture.generator import Generator
+from capture.notes.food_log import FoodLog
+from capture.notes.generator import Generator
 
 
 class NoteType(str, Enum):
