@@ -11,7 +11,7 @@ from capture.notes.food_log import FoodLogEntry
 load_dotenv()
 
 
-class Generator:
+class ContentGenerator:
     def __init__(self):
         self.client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
         self.model = "gpt-4o-mini"
