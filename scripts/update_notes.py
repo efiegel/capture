@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 from watchdog.observers import Observer
 
 from capture.event_handlers import TextFileHandler
-from capture.notes import Notes
+from capture.notes.notes_service import NotesService
 
 load_dotenv()
 
@@ -15,7 +15,7 @@ FOOD_LOG_PATH = os.getenv("FOOD_LOG_PATH")
 
 
 def add_content(file):
-    notes = Notes(
+    notes = NotesService(
         os.path.expanduser(NOTES_DIRECTORY), os.path.expanduser(FOOD_LOG_PATH)
     )
     notes.add_content(file)

@@ -2,8 +2,8 @@ import os
 from datetime import datetime
 from enum import Enum
 
-from capture.food_log import FoodLog
-from capture.generator import Generator
+from capture.notes.content_generator import ContentGenerator
+from capture.notes.food_log import FoodLog
 
 
 class NoteType(str, Enum):
@@ -12,11 +12,11 @@ class NoteType(str, Enum):
     OTHER = "other"
 
 
-class Notes:
+class NotesService:
     def __init__(self, notes_directory: str, food_log_path: str) -> None:
         self.notes_directory = notes_directory
         self.food_log_path = food_log_path
-        self.content_generator = Generator()
+        self.content_generator = ContentGenerator()
 
     def get_or_create_daily_note(self) -> str:
         file_name = f"{datetime.now().strftime('%Y-%m-%d')}.md"
