@@ -2,16 +2,21 @@ import os
 from datetime import datetime
 from enum import Enum
 
+from capture.food_log import FoodLog
 from capture.generator import Generator
 
 
 class NoteType(str, Enum):
     DAILY = "daily"
+    FOOD_LOG = "food_log"
+    OTHER = "other"
 
 
 class Notes:
-    def __init__(self, notes_directory: str) -> None:
+    def __init__(self, notes_directory: str, food_log_path: str) -> None:
         self.notes_directory = notes_directory
+        self.food_log_path = food_log_path
+        self.content_generator = Generator()
 
     def get_or_create_daily_note(self) -> str:
         file_name = f"{datetime.now().strftime('%Y-%m-%d')}.md"
@@ -24,8 +29,7 @@ class Notes:
         with open(file_path, "r") as f:
             existing_content = f.read()
 
-        content_generator = Generator()
-        updated_content = content_generator.integrate_content(
+        updated_content = self.content_generator.integrate_content(
             existing_content, new_content
         )
         self.write(updated_content, file_path)
@@ -38,8 +42,15 @@ class Notes:
         daily_note = self.get_or_create_daily_note()
         self.update_note(daily_note, content)
 
+    def add_content_to_food_log(self, content: str):
+        entries = self.content_generator.parse_food_log_entries(content)
+        log = FoodLog(self.food_log_path)
+        log.add_entries(entries)
+
     def get_note_type(self, content: str) -> NoteType:
-        return NoteType.DAILY
+        return self.content_generator.choose_category(
+            content, [NoteType.FOOD_LOG, NoteType.OTHER]
+        )
 
     def add_content(self, text_file_path: str):
         with open(text_file_path, "r") as f:
@@ -48,5 +59,7 @@ class Notes:
         match self.get_note_type(content):
             case NoteType.DAILY:
                 self.add_content_to_daily_note(content)
+            case NoteType.FOOD_LOG:
+                self.add_content_to_food_log(content)
             case _:
-                pass  # default might eventually go to daily note or raise an error
+                self.add_content_to_daily_note(content)
