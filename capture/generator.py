@@ -5,7 +5,7 @@ from datetime import datetime
 from dotenv import load_dotenv
 from openai import OpenAI
 
-from capture.notes.food_log import FoodLogEntries
+from capture.food_log import FoodLogEntries
 
 load_dotenv()
 
