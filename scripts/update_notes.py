@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 from watchdog.observers import Observer
 
 from capture.event_handlers import TextFileHandler
-from capture.notes.service import NotesService
+from capture.notes.notes_service import NotesService
 
 load_dotenv()
 
