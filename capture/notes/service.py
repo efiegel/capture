@@ -12,7 +12,7 @@ class NoteType(str, Enum):
     OTHER = "other"
 
 
-class Notes:
+class NotesService:
     def __init__(self, notes_directory: str, food_log_path: str) -> None:
         self.notes_directory = notes_directory
         self.food_log_path = food_log_path
