@@ -2,7 +2,7 @@ import os
 from datetime import datetime
 from enum import Enum
 
-from capture.food_log import FoodLog, FoodLogEntries
+from capture.food_log import FoodLog
 from capture.generator import Generator
 
 
@@ -43,7 +43,7 @@ class Notes:
         self.update_note(daily_note, content)
 
     def add_content_to_food_log(self, content: str):
-        entries = self.content_generator.parse_food_log_entries(content, FoodLogEntries)
+        entries = self.content_generator.parse_food_log_entries(content)
         log = FoodLog(self.food_log_path)
         log.add_entries(entries)
 

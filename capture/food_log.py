@@ -10,10 +10,6 @@ class FoodLogEntry(BaseModel):
     unit: str
 
 
-class FoodLogEntries(BaseModel):
-    entries: list[FoodLogEntry]
-
-
 class FoodLog:
     def __init__(self, path: str):
         self.path = path

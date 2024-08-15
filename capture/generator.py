@@ -4,8 +4,9 @@ from datetime import datetime
 
 from dotenv import load_dotenv
 from openai import OpenAI
+from pydantic import BaseModel
 
-from capture.food_log import FoodLogEntries
+from capture.food_log import FoodLogEntry
 
 load_dotenv()
 
@@ -39,13 +40,16 @@ class Generator:
         )
         return response.choices[0].message.content
 
-    def parse_food_log_entries(self, content: str, response_format: FoodLogEntries):
+    def parse_food_log_entries(self, content: str):
         system_message = f"""
         You are an expert at parsing food log entries. You will be provided with a text
         snippet and you will need to parse out the relevant information. When parsing 
         the datetime a food was eaten, just use best judgement on the time of day and
         know that it should be for today, {datetime.now()}.
         """
+
+        class ResponseFormat(BaseModel):
+            entries: list[FoodLogEntry]
 
         response = self.client.beta.chat.completions.parse(
             model=self.model,
@@ -59,7 +63,7 @@ class Generator:
                     "content": content,
                 },
             ],
-            response_format=response_format,
+            response_format=ResponseFormat,
         )
         return json.loads(response.choices[0].message.content)["entries"]
 
