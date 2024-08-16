@@ -5,7 +5,7 @@ import time
 from watchdog.observers import Observer
 
 from capture import settings
-from capture.event_handlers import M4AFileHandler
+from scripts.event_handlers import M4AFileHandler
 
 
 def copy(file):
