@@ -1,7 +1,8 @@
 import csv
+import json
 import os
 from datetime import datetime
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 import pytest
 import time_machine
@@ -12,6 +13,24 @@ CONTENT_GENERATOR = "capture.notes.content_generator.ContentGenerator"
 CHOOSE_CATEGORY = f"{CONTENT_GENERATOR}.choose_category"
 INTEGRATE_CONTENT = f"{CONTENT_GENERATOR}.integrate_content"
 PARSE_FOOD_LOG_ENTRIES = f"{CONTENT_GENERATOR}.parse_food_log_entries"
+
+
+def mock_chat_completions(client, method, return_content, beta=False):
+    response = MagicMock()
+    response.choices[0].message.content = return_content
+
+    if beta:
+        return patch.object(
+            client.beta.chat.completions,
+            method,
+            return_value=response,
+        )
+    else:
+        return patch.object(
+            client.chat.completions,
+            method,
+            return_value=response,
+        )
 
 
 class TestNotesService:
@@ -65,14 +84,16 @@ class TestNotesService:
 
         assert content == integrated_content.return_value
 
-    @patch(
-        PARSE_FOOD_LOG_ENTRIES,
-        return_value=[{"time": "12:00", "name": "apple", "qty": 1, "unit": "whole"}],
-    )
-    @patch(CHOOSE_CATEGORY, return_value="food_log")
-    def test_add_content_writes_to_food_log(self, _, __, tmp_path, food_log):
+    def test_add_content_writes_to_food_log(self, tmp_path, food_log):
         notes_service = NotesService(tmp_path, food_log)
-        notes_service.add_content("I ate an apple at lunch.")
+
+        openai_client = notes_service.content_generator.client
+        entry_list = [{"time": "12:00", "name": "apple", "qty": 1, "unit": "whole"}]
+        entries = json.dumps({"entries": entry_list})
+
+        with mock_chat_completions(openai_client, "create", "food_log"):
+            with mock_chat_completions(openai_client, "parse", entries, beta=True):
+                notes_service.add_content("I ate an apple at lunch.")
 
         with open(food_log, mode="r", newline="") as f:
             reader = csv.reader(f)
