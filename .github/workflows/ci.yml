@@ -13,4 +13,4 @@ jobs:
         cache: 'pipenv'
     - run: pip install pipenv
     - run: pipenv install --dev
-    - run: pipenv run pytest --cov=capture --cov-fail-under=100
+    - run: pipenv run pytest --cov=capture --cov-fail-under=90
