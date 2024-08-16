@@ -54,8 +54,6 @@ class NotesService:
 
     def add_content(self, content: str):
         match self.get_note_type(content):
-            case NoteType.DAILY:
-                self.add_content_to_daily_note(content)
             case NoteType.FOOD_LOG:
                 self.add_content_to_food_log(content)
             case _:
