@@ -14,13 +14,11 @@ jobs:
     - name: Cache pipenv dependencies
       uses: actions/cache@v2
       with:
-        path: ~/.local/share/virtualenvs
+        path: .venv
         key: ${{ runner.os }}-pipenv-${{ hashFiles('Pipfile.lock') }}
         restore-keys: |
           ${{ runner.os }}-pipenv-
-    - name: Verify cache path
-      run: ls -la ~/.local/share/virtualenvs
     - name: Install dependencies
-      run: pipenv install --dev
+      run: PIPENV_VENV_IN_PROJECT=1 pipenv install --dev
     - name: Run tests
-      run: pipenv run pytest --cov=capture --cov-fail-under=100
+      run: PIPENV_VENV_IN_PROJECT=1 pipenv run pytest --cov=capture --cov-fail-under=100
