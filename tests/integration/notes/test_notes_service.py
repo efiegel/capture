@@ -1,7 +1,9 @@
 import os
+from datetime import datetime
 from unittest.mock import patch
 
 import pytest
+import time_machine
 
 from capture.notes.notes_service import NotesService
 
@@ -9,12 +11,14 @@ from capture.notes.notes_service import NotesService
 class TestNotesService:
     @pytest.fixture
     def daily_note(self):
-        file = "tests/sample_data/daily_notes/2024-08-16.md"
-        with open(file, "w") as f:
-            f.write("This is a sample note.")
-        yield file
-        os.remove(file)
+        with time_machine.travel(datetime(1985, 10, 26)):
+            file = f"tests/sample_data/daily_notes/{datetime.now().strftime('%Y-%m-%d')}.md"
+            with open(file, "w") as f:
+                f.write("This is a sample note.")
+            yield file
+            os.remove(file)
 
+    @time_machine.travel(datetime(1985, 10, 26))
     def test_add_daily_note_content(self, daily_note):
         notes_service = NotesService("tests/sample_data/", "tests/sample_data/food.csv")
 
