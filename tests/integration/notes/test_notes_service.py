@@ -34,7 +34,6 @@ class TestNotesService:
             mock.return_value = new_content
             notes_service.add_content_to_daily_note(new_content)
 
-        daily_note = f"{tmp_path}/daily_notes/{datetime.now().strftime('%Y-%m-%d')}.md"
         with open(daily_note, "r") as f:
             content = f.read()
 
