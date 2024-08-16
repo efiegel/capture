@@ -1,4 +1,5 @@
 import os
+from unittest.mock import patch
 
 import pytest
 
@@ -18,9 +19,12 @@ class TestNotesService:
         notes_service = NotesService("tests/sample_data/", "tests/sample_data/food.csv")
 
         new_content = "Here's some more content!"
-        notes_service.add_content_to_daily_note(new_content)
+        integrated_content = "This is a sample note.\n\nHere's some more content!"
+        with patch.object(notes_service.content_generator, "integrate_content") as mock:
+            mock.return_value = integrated_content
+            notes_service.add_content_to_daily_note(new_content)
 
         with open(daily_note, "r") as f:
             content = f.read()
 
-        assert content == "This is a sample note.\n\nHere's some more content!"
+        assert content == integrated_content
