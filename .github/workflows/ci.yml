@@ -12,13 +12,17 @@ jobs:
         python-version: '3.11'
     - run: pip install pipenv
     - name: Cache pipenv dependencies
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: .venv
         key: ${{ runner.os }}-pipenv-${{ hashFiles('Pipfile.lock') }}
         restore-keys: |
           ${{ runner.os }}-pipenv-
+    - name: Check cache directory
+      run: ls -la .venv || echo "No cache directory found"
     - name: Install dependencies
       run: PIPENV_VENV_IN_PROJECT=1 pipenv install --dev
+    - name: Check virtual environment
+      run: ls -la .venv || echo "No virtual environment found"
     - name: Run tests
       run: PIPENV_VENV_IN_PROJECT=1 pipenv run pytest --cov=capture --cov-fail-under=90
