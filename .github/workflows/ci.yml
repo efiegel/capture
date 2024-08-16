@@ -10,21 +10,10 @@ jobs:
     - uses: actions/setup-python@v5
       with:
         python-version: '3.11'
-    - run: pip install pipenv
-    - name: Create .venv directory if not exists
-      run: mkdir -p .venv
-    - name: Check cache directory
-      run: ls -la .venv || echo "No cache directory found"
-    - name: Cache pipenv dependencies
-      uses: actions/cache@v3
-      with:
-        path: .venv
-        key: ${{ runner.os }}-pipenv-${{ hashFiles('Pipfile.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-pipenv-
+        cache: 'pipenv'
     - name: Install dependencies
-      run: PIPENV_VENV_IN_PROJECT=1 pipenv install --dev
-    - name: Check virtual environment
-      run: ls -la .venv || echo "No virtual environment found"
-    - name: Run tests
-      run: PIPENV_VENV_IN_PROJECT=1 pipenv run pytest --cov=capture --cov-fail-under=100
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install pipenv
+        python -m pipenv install --dev
+    - run: ppython -m ipenv run pytest --cov=capture --cov-fail-under=100
