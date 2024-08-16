@@ -31,8 +31,10 @@ class TestNotesService:
 
         new_content = "New content for a new note!"
         with patch.object(notes_service.content_generator, "integrate_content") as mock:
-            mock.return_value = new_content
-            notes_service.add_content_to_daily_note(new_content)
+            with patch.object(notes_service.content_generator, "choose_category") as m2:
+                m2.return_value = "daily"
+                mock.return_value = new_content
+                notes_service.add_content(new_content)
 
         with open(daily_note, "r") as f:
             content = f.read()
@@ -46,8 +48,10 @@ class TestNotesService:
         new_content = "Here's some more content!"
         integrated_content = "This is a sample note.\n\nHere's some more content!"
         with patch.object(notes_service.content_generator, "integrate_content") as mock:
-            mock.return_value = integrated_content
-            notes_service.add_content_to_daily_note(new_content)
+            with patch.object(notes_service.content_generator, "choose_category") as m2:
+                m2.return_value = "daily"
+                mock.return_value = integrated_content
+                notes_service.add_content(new_content)
 
         with open(daily_note, "r") as f:
             content = f.read()
