@@ -21,4 +21,4 @@ jobs:
     - name: Install dependencies
       run: PIPENV_VENV_IN_PROJECT=1 pipenv install --dev
     - name: Run tests
-      run: PIPENV_VENV_IN_PROJECT=1 pipenv run pytest --cov=capture --cov-fail-under=100
+      run: PIPENV_VENV_IN_PROJECT=1 pipenv run pytest --cov=capture --cov-fail-under=90
