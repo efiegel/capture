@@ -52,10 +52,7 @@ class NotesService:
             content, [NoteType.FOOD_LOG, NoteType.OTHER]
         )
 
-    def add_content(self, text_file_path: str):
-        with open(text_file_path, "r") as f:
-            content = f.read()
-
+    def add_content(self, content: str):
         match self.get_note_type(content):
             case NoteType.DAILY:
                 self.add_content_to_daily_note(content)
