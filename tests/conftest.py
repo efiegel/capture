@@ -6,7 +6,7 @@ from capture.db import all_models, database_context
 test_db = SqliteDatabase(":memory:")
 
 
-@pytest.fixture(scope="session", autouse=True)
+@pytest.fixture(scope="function", autouse=True)
 def db():
     with database_context(test_db):
         yield test_db
