@@ -31,9 +31,9 @@ def mock_chat_completions(client, method, return_content, beta=False):
 class TestNotesService:
     @pytest.fixture
     def daily_note_directory(self, tmp_path):
-        d = tmp_path / "daily_notes"
-        d.mkdir()
-        return d
+        dir = tmp_path / "daily_notes"
+        dir.mkdir()
+        return dir
 
     @pytest.fixture
     def daily_note(self, daily_note_directory):
