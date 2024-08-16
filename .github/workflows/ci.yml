@@ -18,6 +18,8 @@ jobs:
         key: ${{ runner.os }}-pipenv-${{ hashFiles('Pipfile.lock') }}
         restore-keys: |
           ${{ runner.os }}-pipenv-
+    - name: Create .venv directory if not exists
+      run: mkdir -p .venv
     - name: Check cache directory
       run: ls -la .venv || echo "No cache directory found"
     - name: Install dependencies
