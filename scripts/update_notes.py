@@ -3,13 +3,16 @@ import time
 from watchdog.observers import Observer
 
 from capture import settings
-from capture.event_handlers import TextFileHandler
 from capture.notes.notes_service import NotesService
+from scripts.event_handlers import TextFileHandler
 
 
 def add_content(file):
+    with open(file, "r") as f:
+        content = f.read()
+
     notes = NotesService(settings.NOTES_DIRECTORY, settings.FOOD_LOG_PATH)
-    notes.add_content(file)
+    notes.add_content(content)
 
 
 if __name__ == "__main__":
