@@ -74,17 +74,12 @@ class ContentGenerator:
         Existing content: '{existing_content}'. New information: '{new_content}'.
         """
 
-        response = self.client.chat.completions.create(
-            model=self.model,
-            messages=[
-                {
-                    "role": "system",
-                    "content": system_message,
-                },
-                {
-                    "role": "user",
-                    "content": user_message,
-                },
-            ],
-        )
-        return response.choices[0].message.content
+        messages = [
+            SystemMessage(content=system_message),
+            HumanMessage(content=user_message),
+        ]
+
+        model = ChatOpenAI(model="gpt-4o-mini")
+        response = model.invoke(messages)
+
+        return response.content

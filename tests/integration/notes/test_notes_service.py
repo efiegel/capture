@@ -10,24 +10,6 @@ from langchain_core.messages import BaseMessage
 from capture.notes.notes_service import NotesService
 
 
-def mock_chat_completions(client, method, return_content, beta=False):
-    response = MagicMock()
-    response.choices[0].message.content = return_content
-
-    if beta:
-        return patch.object(
-            client.beta.chat.completions,
-            method,
-            return_value=response,
-        )
-    else:
-        return patch.object(
-            client.chat.completions,
-            method,
-            return_value=response,
-        )
-
-
 def patch_model_responses(responses):
     return patch(
         "langchain_openai.ChatOpenAI.invoke",
@@ -74,12 +56,9 @@ class TestNotesService:
         assert os.path.exists(daily_note) is False
 
         notes_service = NotesService(tmp_path, "tests/sample_data/food.csv")
-        openai_client = notes_service.content_generator.client
         integrated_content = "This is a sample note.\n\nMore content!"
-
-        with mock_chat_completions(openai_client, "create", "daily_note"):
-            with mock_chat_completions(openai_client, "create", integrated_content):
-                notes_service.add_content("New content for a new note!")
+        with patch_model_responses(["daily_note", integrated_content]):
+            notes_service.add_content("New content for a new note!")
 
         with open(daily_note, "r") as f:
             content = f.read()
@@ -89,13 +68,9 @@ class TestNotesService:
     @time_machine.travel(datetime(1985, 10, 26))
     def test_add_content_writes_to_existing_daily_note(self, tmp_path, daily_note):
         notes_service = NotesService(tmp_path, "tests/sample_data/food.csv")
-
-        openai_client = notes_service.content_generator.client
         integrated_content = "This is a sample note.\n\nMore content!"
-
-        with mock_chat_completions(openai_client, "create", "daily_note"):
-            with mock_chat_completions(openai_client, "create", integrated_content):
-                notes_service.add_content("More content!")
+        with patch_model_responses(["daily_note", integrated_content]):
+            notes_service.add_content("More content!")
 
         with open(daily_note, "r") as f:
             content = f.read()
