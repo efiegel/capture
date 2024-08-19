@@ -28,6 +28,13 @@ def mock_chat_completions(client, method, return_content, beta=False):
         )
 
 
+def patch_model_response(return_content):
+    return patch(
+        "langchain_openai.ChatOpenAI.invoke",
+        return_value=MagicMock(content=return_content),
+    )
+
+
 class TestNotesService:
     @pytest.fixture
     def daily_note_directory(self, tmp_path):
@@ -92,7 +99,7 @@ class TestNotesService:
         entry_list = [{"time": "12:00", "name": "apple", "qty": 1, "unit": "whole"}]
         entries = json.dumps({"entries": entry_list})
 
-        with mock_chat_completions(openai_client, "create", "food_log"):
+        with patch_model_response("food_log"):
             with mock_chat_completions(openai_client, "parse", entries, beta=True):
                 notes_service.add_content("I ate an apple at lunch.")
 

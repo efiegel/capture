@@ -1,6 +1,8 @@
 import json
 from datetime import datetime
 
+from langchain_core.messages import HumanMessage, SystemMessage
+from langchain_openai import ChatOpenAI
 from openai import OpenAI
 from pydantic import BaseModel
 
@@ -20,22 +22,15 @@ class ContentGenerator:
         fits the text. Return only the name of the category.
         """
 
-        user_message = f"Sample: '{content}'. : '{categories}'."
+        messages = [
+            SystemMessage(content=system_message),
+            HumanMessage(content=f"Sample: '{content}'. : '{categories}'."),
+        ]
 
-        response = self.client.chat.completions.create(
-            model=self.model,
-            messages=[
-                {
-                    "role": "system",
-                    "content": system_message,
-                },
-                {
-                    "role": "user",
-                    "content": user_message,
-                },
-            ],
-        )
-        return response.choices[0].message.content
+        model = ChatOpenAI(model="gpt-4o-mini")
+        response = model.invoke(messages)
+
+        return response.content
 
     def parse_food_log_entries(self, content: str):
         system_message = f"""
