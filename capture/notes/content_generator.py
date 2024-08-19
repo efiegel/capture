@@ -16,7 +16,7 @@ class ContentGenerator:
         self.client = OpenAI(api_key=settings.OPENAI_API_KEY)
         self.model = "gpt-4o-mini"
 
-    def choose_category(self, content: str, categories: list[str]):
+    def choose_category(self, content: str, categories: list[str]) -> str:
         system_message = """
         You are an expert at categorizing content. You will be provided with a sample
         of text and a list of categories. Your task is to choose the category that best
@@ -33,7 +33,7 @@ class ContentGenerator:
 
         return response.content
 
-    def parse_food_log_entries(self, content: str):
+    def parse_food_log_entries(self, content: str) -> list[FoodLogEntry]:
         system_message = f"""
         You are an expert at parsing food log entries. You will be provided with a text
         snippet and you will need to parse out the relevant information. When parsing 
@@ -61,7 +61,7 @@ class ContentGenerator:
 
         return response.entries
 
-    def integrate_content(self, existing_content: str, new_content: str):
+    def integrate_content(self, existing_content: str, new_content: str) -> str:
         system_message = """
         You are an expert at writing markdown and note-taking. You will be provided with
         existing content of a markdown file and also new information that needs to be
