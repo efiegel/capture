@@ -4,17 +4,14 @@ from langchain.output_parsers import PydanticOutputParser
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_core.prompts import PromptTemplate
 from langchain_openai import ChatOpenAI
-from openai import OpenAI
 from pydantic import BaseModel
 
-from capture import settings
 from capture.notes.food_log import FoodLogEntry
 
 
 class ContentGenerator:
     def __init__(self):
-        self.client = OpenAI(api_key=settings.OPENAI_API_KEY)
-        self.model = "gpt-4o-mini"
+        self.model = ChatOpenAI(model="gpt-4o-mini")
 
     def choose_category(self, content: str, categories: list[str]) -> str:
         system_message = """
@@ -28,8 +25,7 @@ class ContentGenerator:
             HumanMessage(content=f"Sample: '{content}'. : '{categories}'."),
         ]
 
-        model = ChatOpenAI(model="gpt-4o-mini")
-        response = model.invoke(messages)
+        response = self.model.invoke(messages)
 
         return response.content
 
@@ -55,8 +51,7 @@ class ContentGenerator:
             },
         )
 
-        model = ChatOpenAI(model="gpt-4o-mini")
-        chain = prompt | model | parser
+        chain = prompt | self.model | parser
         response = chain.invoke({"content": content})
 
         return response.entries
@@ -79,7 +74,6 @@ class ContentGenerator:
             HumanMessage(content=user_message),
         ]
 
-        model = ChatOpenAI(model="gpt-4o-mini")
-        response = model.invoke(messages)
+        response = self.model.invoke(messages)
 
         return response.content
