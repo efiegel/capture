@@ -14,7 +14,8 @@ openai-whisper = "*"
 peewee = "*"
 watchdog = "*"
 python-dotenv = "*"
-openai = "*"
+langchain = "*"
+langchain-openai = "*"
 
 [requires]
 python_version = "3.11"

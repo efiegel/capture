@@ -18,4 +18,4 @@ class FoodLog:
         with open(self.path, mode="a", newline="") as file:
             writer = csv.writer(file)
             for entry in entries:
-                writer.writerow(list(entry.values()))
+                writer.writerow(list(entry.model_dump().values()))

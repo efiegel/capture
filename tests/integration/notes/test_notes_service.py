@@ -1,31 +1,30 @@
 import csv
-import json
 import os
 from datetime import datetime
 from unittest.mock import MagicMock, patch
 
 import pytest
 import time_machine
+from langchain_core.messages import BaseMessage
 
 from capture.notes.notes_service import NotesService
 
 
-def mock_chat_completions(client, method, return_content, beta=False):
-    response = MagicMock()
-    response.choices[0].message.content = return_content
+def patch_model_responses(responses):
+    return patch(
+        "langchain_openai.ChatOpenAI.invoke",
+        side_effect=[
+            MagicMock(spec=BaseMessage, content=response, text=str(response))
+            for response in responses
+        ],
+    )
 
-    if beta:
-        return patch.object(
-            client.beta.chat.completions,
-            method,
-            return_value=response,
-        )
-    else:
-        return patch.object(
-            client.chat.completions,
-            method,
-            return_value=response,
-        )
+
+def patch_json_parsing(result):
+    return patch(
+        "langchain_core.output_parsers.json.JsonOutputParser.parse_result",
+        side_effect=[result],
+    )
 
 
 class TestNotesService:
@@ -57,12 +56,9 @@ class TestNotesService:
         assert os.path.exists(daily_note) is False
 
         notes_service = NotesService(tmp_path, "tests/sample_data/food.csv")
-        openai_client = notes_service.content_generator.client
         integrated_content = "This is a sample note.\n\nMore content!"
-
-        with mock_chat_completions(openai_client, "create", "daily_note"):
-            with mock_chat_completions(openai_client, "create", integrated_content):
-                notes_service.add_content("New content for a new note!")
+        with patch_model_responses(["daily_note", integrated_content]):
+            notes_service.add_content("New content for a new note!")
 
         with open(daily_note, "r") as f:
             content = f.read()
@@ -72,13 +68,9 @@ class TestNotesService:
     @time_machine.travel(datetime(1985, 10, 26))
     def test_add_content_writes_to_existing_daily_note(self, tmp_path, daily_note):
         notes_service = NotesService(tmp_path, "tests/sample_data/food.csv")
-
-        openai_client = notes_service.content_generator.client
         integrated_content = "This is a sample note.\n\nMore content!"
-
-        with mock_chat_completions(openai_client, "create", "daily_note"):
-            with mock_chat_completions(openai_client, "create", integrated_content):
-                notes_service.add_content("More content!")
+        with patch_model_responses(["daily_note", integrated_content]):
+            notes_service.add_content("More content!")
 
         with open(daily_note, "r") as f:
             content = f.read()
@@ -87,13 +79,14 @@ class TestNotesService:
 
     def test_add_content_writes_to_food_log(self, tmp_path, food_log):
         notes_service = NotesService(tmp_path, food_log)
-
-        openai_client = notes_service.content_generator.client
         entry_list = [{"time": "12:00", "name": "apple", "qty": 1, "unit": "whole"}]
-        entries = json.dumps({"entries": entry_list})
 
-        with mock_chat_completions(openai_client, "create", "food_log"):
-            with mock_chat_completions(openai_client, "parse", entries, beta=True):
+        # need to patch the model call that parses the food log entries so that the api
+        # isn't actually called, but also patching the parsed result which is the actual
+        # end of the chain; hence the None model response patch. Could wrap the chain
+        # and mock the entire thing if desired, this is all a product of the | syntax.
+        with patch_model_responses(["food_log", None]):
+            with patch_json_parsing({"entries": entry_list}):
                 notes_service.add_content("I ate an apple at lunch.")
 
         with open(food_log, mode="r", newline="") as f:
@@ -101,4 +94,4 @@ class TestNotesService:
             next(reader)  # skip header
             entries = [row for row in reader]
 
-        assert entries == [["12:00", "apple", "1", "whole"]]
+        assert entries == [["12:00", "apple", "1.0", "whole"]]
