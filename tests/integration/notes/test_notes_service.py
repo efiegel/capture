@@ -1,11 +1,11 @@
 import csv
-import json
 import os
 from datetime import datetime
 from unittest.mock import MagicMock, patch
 
 import pytest
 import time_machine
+from langchain_core.messages import BaseMessage
 
 from capture.notes.notes_service import NotesService
 
@@ -28,10 +28,20 @@ def mock_chat_completions(client, method, return_content, beta=False):
         )
 
 
-def patch_model_response(return_content):
+def patch_model_responses(responses):
     return patch(
         "langchain_openai.ChatOpenAI.invoke",
-        return_value=MagicMock(content=return_content),
+        side_effect=[
+            MagicMock(spec=BaseMessage, content=response, text=str(response))
+            for response in responses
+        ],
+    )
+
+
+def patch_json_parsing(result):
+    return patch(
+        "langchain_core.output_parsers.json.JsonOutputParser.parse_result",
+        side_effect=[result],
     )
 
 
@@ -94,13 +104,14 @@ class TestNotesService:
 
     def test_add_content_writes_to_food_log(self, tmp_path, food_log):
         notes_service = NotesService(tmp_path, food_log)
-
-        openai_client = notes_service.content_generator.client
         entry_list = [{"time": "12:00", "name": "apple", "qty": 1, "unit": "whole"}]
-        entries = json.dumps({"entries": entry_list})
 
-        with patch_model_response("food_log"):
-            with mock_chat_completions(openai_client, "parse", entries, beta=True):
+        # need to patch the model call that parses the food log entries so that the api
+        # isn't actually called, but also patching the parsed result which is the actual
+        # end of the chain; hence the None model response patch. Could wrap the chain
+        # and mock the entire thing if desired, this is all a product of the | syntax.
+        with patch_model_responses(["food_log", None]):
+            with patch_json_parsing({"entries": entry_list}):
                 notes_service.add_content("I ate an apple at lunch.")
 
         with open(food_log, mode="r", newline="") as f:
@@ -108,4 +119,4 @@ class TestNotesService:
             next(reader)  # skip header
             entries = [row for row in reader]
 
-        assert entries == [["12:00", "apple", "1", "whole"]]
+        assert entries == [["12:00", "apple", "1.0", "whole"]]

@@ -1,7 +1,8 @@
-import json
 from datetime import datetime
 
+from langchain.output_parsers import PydanticOutputParser
 from langchain_core.messages import HumanMessage, SystemMessage
+from langchain_core.prompts import PromptTemplate
 from langchain_openai import ChatOpenAI
 from openai import OpenAI
 from pydantic import BaseModel
@@ -43,21 +44,22 @@ class ContentGenerator:
         class ResponseFormat(BaseModel):
             entries: list[FoodLogEntry]
 
-        response = self.client.beta.chat.completions.parse(
-            model=self.model,
-            messages=[
-                {
-                    "role": "system",
-                    "content": system_message,
-                },
-                {
-                    "role": "user",
-                    "content": content,
-                },
-            ],
-            response_format=ResponseFormat,
+        parser = PydanticOutputParser(pydantic_object=ResponseFormat)
+
+        prompt = PromptTemplate(
+            template="{system_message}\n{format_instructions}\n{content}\n",
+            input_variables=["content"],
+            partial_variables={
+                "system_message": system_message,
+                "format_instructions": parser.get_format_instructions(),
+            },
         )
-        return json.loads(response.choices[0].message.content)["entries"]
+
+        model = ChatOpenAI(model="gpt-4o-mini")
+        chain = prompt | model | parser
+        response = chain.invoke({"content": content})
+
+        return response.entries
 
     def integrate_content(self, existing_content: str, new_content: str):
         system_message = """
