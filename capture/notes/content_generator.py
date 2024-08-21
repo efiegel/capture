@@ -1,17 +1,24 @@
 from datetime import datetime
 
 from langchain.output_parsers import PydanticOutputParser
+from langchain_chroma import Chroma
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_core.prompts import PromptTemplate
-from langchain_openai import ChatOpenAI
+from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from pydantic import BaseModel
+from settings import VECTORSTORE_PATH
 
 from capture.notes.food_log import FoodLogEntry
+from capture.rag import format_docs
 
 
 class ContentGenerator:
     def __init__(self):
         self.model = ChatOpenAI(model="gpt-4o-mini")
+        self.vectorstore = Chroma(
+            persist_directory=VECTORSTORE_PATH,
+            embedding_function=OpenAIEmbeddings(),
+        )
 
     def choose_category(self, content: str, categories: list[str]) -> str:
         system_message = """
@@ -19,7 +26,6 @@ class ContentGenerator:
         of text and a list of categories. Your task is to choose the category that best
         fits the text. Return only the name of the category.
         """
-
         messages = [
             SystemMessage(content=system_message),
             HumanMessage(content=f"Sample: '{content}'. : '{categories}'."),
@@ -34,7 +40,9 @@ class ContentGenerator:
         You are an expert at parsing food log entries. You will be provided with a text
         snippet and you will need to parse out the relevant information. When parsing 
         the datetime a food was eaten, just use best judgement on the time of day and
-        know that it should be for today, {datetime.now()}.
+        know that it should be for today, {datetime.now()}. You'll also be provided with
+        data on the nutritional content of various foods. Use this data in nutrient 
+        parsing and calculations only.
         """
 
         class ResponseFormat(BaseModel):
@@ -43,11 +51,12 @@ class ContentGenerator:
         parser = PydanticOutputParser(pydantic_object=ResponseFormat)
 
         prompt = PromptTemplate(
-            template="{system_message}\n{format_instructions}\n{content}\n",
+            template="{system_message}\n{format_instructions}\n{context}\n{content}\n",
             input_variables=["content"],
             partial_variables={
                 "system_message": system_message,
                 "format_instructions": parser.get_format_instructions(),
+                "context": self.vectorstore.as_retriever() | format_docs,
             },
         )
 
