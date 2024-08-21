@@ -4,11 +4,11 @@
 # Environment variables
 .env
 
-# Database files
-*.db
 
-# Data directories
-/data
+# Data/database files and directories
+/.chroma
+/.data
+*.db
 
 # Coverage reports
 .coverage*
