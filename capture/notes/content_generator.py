@@ -10,6 +10,7 @@ from settings import VECTORSTORE_PATH
 
 from capture.notes.food_log import FoodLogEntry
 from capture.rag import format_docs
+from capture.settings import VECTORSTORE_PATH
 
 
 class ContentGenerator:

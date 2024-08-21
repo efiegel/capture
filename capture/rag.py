@@ -1,7 +1,8 @@
 from langchain_chroma import Chroma
 from langchain_community.document_loaders.csv_loader import CSVLoader
 from langchain_openai import OpenAIEmbeddings
-from settings import VECTORSTORE_PATH
+
+from capture.settings import VECTORSTORE_PATH
 
 
 def format_docs(docs):
