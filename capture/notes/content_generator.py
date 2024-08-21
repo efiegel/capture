@@ -6,7 +6,6 @@ from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_core.prompts import PromptTemplate
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from pydantic import BaseModel
-from settings import VECTORSTORE_PATH
 
 from capture.notes.food_log import FoodLogEntry
 from capture.rag import format_docs
