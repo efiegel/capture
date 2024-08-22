@@ -1,8 +1,8 @@
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 from langchain_openai import OpenAIEmbeddings
 
-from capture.rag import load_csv_data
+from capture.rag import format_docs, load_csv_data
 from capture.settings import VECTORSTORE_PATH
 
 
@@ -19,3 +19,9 @@ class TestRAG:
             embedding=OpenAIEmbeddings(),
             persist_directory=VECTORSTORE_PATH,
         )
+
+    def test_format_docs(self):
+        docs = [Mock(page_content="doc 1"), Mock(page_content="doc 2")]
+        formatted_docs = format_docs(docs)
+
+        assert formatted_docs == "doc 1\n\ndoc 2"
