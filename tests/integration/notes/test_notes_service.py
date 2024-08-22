@@ -79,7 +79,19 @@ class TestNotesService:
 
     def test_add_content_writes_to_food_log(self, tmp_path, food_log):
         notes_service = NotesService(tmp_path, food_log)
-        entry_list = [{"time": "12:00", "name": "apple", "qty": 1, "unit": "whole"}]
+        entry_list = [
+            {
+                "time": "12:00",
+                "name": "apple",
+                "qty": 1,
+                "unit": "whole",
+                "calories": 95.0,
+                "protein_grams": 0.5,
+                "fat_grams": 0.3,
+                "carbs_grams": 25.0,
+                "sodium_mg": 2.0,
+            }
+        ]
 
         # need to patch the model call that parses the food log entries so that the api
         # isn't actually called, but also patching the parsed result which is the actual
@@ -94,4 +106,6 @@ class TestNotesService:
             next(reader)  # skip header
             entries = [row for row in reader]
 
-        assert entries == [["12:00", "apple", "1.0", "whole"]]
+        assert entries == [
+            ["12:00", "apple", "1.0", "whole", "95.0", "0.5", "0.3", "25.0", "2.0"]
+        ]

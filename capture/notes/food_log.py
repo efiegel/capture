@@ -8,6 +8,11 @@ class FoodLogEntry(BaseModel):
     name: str
     qty: float
     unit: str
+    calories: float
+    protein_grams: float
+    fat_grams: float
+    carbs_grams: float
+    sodium_mg: float
 
 
 class FoodLog:
