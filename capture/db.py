@@ -1,6 +1,5 @@
 from contextlib import contextmanager
 from datetime import datetime
-from uuid import uuid4
 
 from peewee import (
     CharField,
@@ -9,7 +8,6 @@ from peewee import (
     IntegerField,
     Model,
     SqliteDatabase,
-    TextField,
 )
 
 db = SqliteDatabase("capture.db")
@@ -45,12 +43,4 @@ class AudioTranscription(BaseModel):
     created_at = DateTimeField(default=datetime.now)
 
 
-class Note(BaseModel):
-    uuid = CharField(primary_key=True, default=uuid4())
-    type = CharField()
-    raw_text = TextField()
-    parsed_data = TextField()
-    created_at = DateTimeField(default=datetime.now)
-
-
-all_models = [RawAudio, AudioTranscription, Note]
+all_models = [RawAudio, AudioTranscription]
