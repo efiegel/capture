@@ -1,7 +1,6 @@
 from langchain_chroma import Chroma
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
-from pydantic import BaseModel
 
 from capture.llm import Parser
 from capture.notes.food_log import FoodLogEntry
@@ -32,12 +31,8 @@ class ContentGenerator:
         return response.content
 
     def parse_food_log_entries(self, content: str) -> list[FoodLogEntry]:
-        class Entries(BaseModel):
-            entries: list[FoodLogEntry]
-
-        parser = Parser(response_format=Entries)
-        response = parser.parse(content)
-        return response.entries
+        parser = Parser(list[FoodLogEntry])
+        return parser.parse(content)
 
     def integrate_content(self, existing_content: str, new_content: str) -> str:
         system_message = """

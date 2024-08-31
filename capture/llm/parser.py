@@ -1,17 +1,18 @@
 from datetime import datetime
+from typing import List, Union
 
 from langchain.output_parsers import PydanticOutputParser
 from langchain_chroma import Chroma
 from langchain_core.prompts import PromptTemplate
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
-from pydantic import BaseModel
+from pydantic import BaseModel, create_model
 
 from capture.rag import format_docs
 from capture.settings import VECTORSTORE_PATH
 
 
 class Parser:
-    def __init__(self, response_format: BaseModel):
+    def __init__(self, response_format: Union[BaseModel, list[BaseModel]]):
         self.response_format = response_format
         self.model = ChatOpenAI(model="gpt-4o-mini")
         self.vectorstore = Chroma(
@@ -19,8 +20,7 @@ class Parser:
             embedding_function=OpenAIEmbeddings(),
         )
 
-    @property
-    def chain(self):
+    def chain(self, response_model: BaseModel):
         system_message = f"""
         You are an expert at parsinglog entries. You will be provided with a text
         snippet and you will need to parse out the relevant information. When parsing 
@@ -29,7 +29,7 @@ class Parser:
         additional relevant context to aid your parsing task.
         """
 
-        parser = PydanticOutputParser(pydantic_object=self.response_format)
+        parser = PydanticOutputParser(pydantic_object=response_model)
 
         prompt = PromptTemplate(
             template="{system_message}\n{format_instructions}\n{context}\n{content}\n",
@@ -44,4 +44,16 @@ class Parser:
         return prompt | self.model | parser
 
     def parse(self, content: str):
-        return self.chain.invoke({"content": content})
+        if self.response_format.__origin__ is list:
+            return self._parse_list(content)
+        return self._parse(content)
+
+    def _parse(self, content: str):
+        return self.chain(self.response_format).invoke({"content": content})
+
+    def _parse_list(self, content: str):
+        item_type = self.response_format.__args__[0]
+        Entries = create_model("Entries", entries=(List[item_type], ...))
+
+        response = self.chain(response_model=Entries).invoke({"content": content})
+        return response.entries
