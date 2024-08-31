@@ -20,8 +20,7 @@ class Parser:
             embedding_function=OpenAIEmbeddings(),
         )
 
-    @property
-    def chain(self):
+    def create_chain(self, parser_pydantic_object: Type[BaseModel]):
         system_message = f"""
         You are an expert at parsinglog entries. You will be provided with a text
         snippet and you will need to parse out the relevant information. When parsing 
@@ -30,7 +29,7 @@ class Parser:
         additional relevant context to aid your parsing task.
         """
 
-        parser = PydanticOutputParser(pydantic_object=self._get_chain_response_model())
+        parser = PydanticOutputParser(pydantic_object=parser_pydantic_object)
 
         prompt = PromptTemplate(
             template="{system_message}\n{format_instructions}\n{context}\n{content}\n",
@@ -45,16 +44,13 @@ class Parser:
         return prompt | self.model | parser
 
     def parse(self, content: str):
-        model_response = self.chain.invoke({"content": content})
-        if self._response_format_is_list():
-            return model_response.items
-        return model_response
+        if self.response_format.__origin__ is list:
+            chain = self.create_chain(self._create_items_model(self.response_format))
+            return chain.invoke({"content": content}).items
+        else:
+            chain = self.create_chain(self.response_format)
+            return chain.invoke({"content": content})
 
-    def _response_format_is_list(self) -> bool:
-        return self.response_format.__origin__ is list
-
-    def _get_chain_response_model(self) -> BaseModel:
-        if self._response_format_is_list():
-            item_type = self.response_format.__args__[0]
-            return create_model("Items", items=(List[item_type], ...))
-        return self.response_format
+    @staticmethod
+    def _create_items_model(obj: Type[list[BaseModel]]):
+        return create_model("Items", items=(List[obj.__args__[0]], ...))
