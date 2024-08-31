@@ -12,7 +12,7 @@ from capture.settings import VECTORSTORE_PATH
 
 
 class Parser:
-    def __init__(self, response_format: Union[Type[BaseModel], list[Type[BaseModel]]]):
+    def __init__(self, response_format: Union[Type[BaseModel], Type[list[BaseModel]]]):
         self.response_format = response_format
         self.model = ChatOpenAI(model="gpt-4o-mini")
         self.vectorstore = Chroma(
