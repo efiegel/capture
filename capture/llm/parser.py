@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import List, Union
+from typing import List, Type, Union
 
 from langchain.output_parsers import PydanticOutputParser
 from langchain_chroma import Chroma
@@ -12,7 +12,7 @@ from capture.settings import VECTORSTORE_PATH
 
 
 class Parser:
-    def __init__(self, response_format: Union[BaseModel, list[BaseModel]]):
+    def __init__(self, response_format: Union[Type[BaseModel], list[Type[BaseModel]]]):
         self.response_format = response_format
         self.response_model = self._get_chain_response_model()
         self.model = ChatOpenAI(model="gpt-4o-mini")
