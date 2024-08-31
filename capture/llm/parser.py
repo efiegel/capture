@@ -10,9 +10,6 @@ from pydantic import BaseModel, create_model
 from capture.rag import format_docs
 from capture.settings import VECTORSTORE_PATH
 
-# for when the response format is a list of pydantic objects
-ITEMS_ATTR_NAME = "items"
-
 
 class Parser:
     def __init__(self, response_format: Union[Type[BaseModel], list[Type[BaseModel]]]):
@@ -48,10 +45,10 @@ class Parser:
         return prompt | self.model | parser
 
     def parse(self, content: str):
-        response = self.chain.invoke({"content": content})
+        model_response = self.chain.invoke({"content": content})
         if self._response_format_is_list():
-            return getattr(response, ITEMS_ATTR_NAME)
-        return response
+            return model_response.items
+        return model_response
 
     def _response_format_is_list(self) -> bool:
         return self.response_format.__origin__ is list
@@ -59,5 +56,5 @@ class Parser:
     def _get_chain_response_model(self) -> BaseModel:
         if self._response_format_is_list():
             item_type = self.response_format.__args__[0]
-            return create_model("Items", **{ITEMS_ATTR_NAME: (List[item_type], ...)})
+            return create_model("Items", items=(List[item_type], ...))
         return self.response_format
