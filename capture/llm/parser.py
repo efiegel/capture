@@ -53,7 +53,7 @@ class Parser:
 
     def _parse_list(self, content: str):
         item_type = self.response_format.__args__[0]
-        Entries = create_model("Entries", entries=(List[item_type], ...))
+        Items = create_model("Items", items=(List[item_type], ...))
 
-        response = self.chain(response_model=Entries).invoke({"content": content})
-        return response.entries
+        response = self.chain(response_model=Items).invoke({"content": content})
+        return response.items

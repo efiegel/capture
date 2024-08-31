@@ -98,7 +98,7 @@ class TestNotesService:
         # end of the chain; hence the None model response patch. Could wrap the chain
         # and mock the entire thing if desired, this is all a product of the | syntax.
         with patch_model_responses(["food_log", None]):
-            with patch_json_parsing({"entries": entry_list}):
+            with patch_json_parsing({"items": entry_list}):
                 notes_service.add_content("I ate an apple at lunch.")
 
         with open(food_log, mode="r", newline="") as f:
