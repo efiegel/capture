@@ -46,14 +46,12 @@ class Parser:
     def parse(self, content: str):
         if self.response_format.__origin__ is list:
             return self._parse_list(content)
-        return self._parse(content)
+        return self._parse(self.response_format, content)
 
-    def _parse(self, content: str):
-        return self.chain(self.response_format).invoke({"content": content})
+    def _parse(self, response_model, content: str):
+        return self.chain(response_model).invoke({"content": content})
 
     def _parse_list(self, content: str):
         item_type = self.response_format.__args__[0]
         Items = create_model("Items", items=(List[item_type], ...))
-
-        response = self.chain(response_model=Items).invoke({"content": content})
-        return response.items
+        return self._parse(Items, content).items
