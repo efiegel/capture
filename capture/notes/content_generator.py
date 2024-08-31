@@ -1,14 +1,10 @@
-from datetime import datetime
-
-from langchain.output_parsers import PydanticOutputParser
 from langchain_chroma import Chroma
 from langchain_core.messages import HumanMessage, SystemMessage
-from langchain_core.prompts import PromptTemplate
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from pydantic import BaseModel
 
+from capture.llm import Parser
 from capture.notes.food_log import FoodLogEntry
-from capture.rag import format_docs
 from capture.settings import VECTORSTORE_PATH
 
 
@@ -36,33 +32,11 @@ class ContentGenerator:
         return response.content
 
     def parse_food_log_entries(self, content: str) -> list[FoodLogEntry]:
-        system_message = f"""
-        You are an expert at parsing food log entries. You will be provided with a text
-        snippet and you will need to parse out the relevant information. When parsing 
-        the datetime a food was eaten, just use best judgement on the time of day and
-        know that it should be for today, {datetime.now()}. You'll also be provided with
-        data on the nutritional content of various foods. Use this data in nutrient 
-        parsing and calculations only.
-        """
-
-        class ResponseFormat(BaseModel):
+        class Entries(BaseModel):
             entries: list[FoodLogEntry]
 
-        parser = PydanticOutputParser(pydantic_object=ResponseFormat)
-
-        prompt = PromptTemplate(
-            template="{system_message}\n{format_instructions}\n{context}\n{content}\n",
-            input_variables=["content"],
-            partial_variables={
-                "system_message": system_message,
-                "format_instructions": parser.get_format_instructions(),
-                "context": self.vectorstore.as_retriever() | format_docs,
-            },
-        )
-
-        chain = prompt | self.model | parser
-        response = chain.invoke({"content": content})
-
+        parser = Parser(response_format=Entries)
+        response = parser.parse(content)
         return response.entries
 
     def integrate_content(self, existing_content: str, new_content: str) -> str:
