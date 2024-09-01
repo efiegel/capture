@@ -2,12 +2,11 @@ from datetime import datetime
 from typing import List, Type, Union
 
 from langchain.output_parsers import PydanticOutputParser
-from langchain_core.documents import Document
 from langchain_core.prompts import PromptTemplate
 from langchain_openai import ChatOpenAI
 from pydantic import BaseModel, create_model
 
-from capture.llm.vectorstore import vectorstore
+from capture.llm.vectorstore import format_docs, vectorstore
 
 
 class Parser:
@@ -42,7 +41,7 @@ class Parser:
             partial_variables={
                 "system_message": system_message,
                 "format_instructions": parser.get_format_instructions(),
-                "context": vectorstore.as_retriever() | self._format_docs,
+                "context": vectorstore.as_retriever() | format_docs,
             },
         )
 
@@ -51,7 +50,3 @@ class Parser:
     @staticmethod
     def _create_items_model(obj: Type[list[BaseModel]]):
         return create_model("Items", items=(List[obj.__args__[0]], ...))
-
-    @staticmethod
-    def _format_docs(docs: list[Document]):
-        return "\n\n".join(doc.page_content for doc in docs)
