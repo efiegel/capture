@@ -18,7 +18,15 @@ class Parser:
         self.response_format = response_format
         self.vectorstore_directory = vectorstore_directory
 
-    def create_chain(self, parser_pydantic_object: Type[BaseModel]):
+    def parse(self, content: str):
+        if self.response_format.__origin__ is list:
+            chain = self._create_chain(self._create_items_model(self.response_format))
+            return chain.invoke({"content": content}).items
+        else:
+            chain = self._create_chain(self.response_format)
+            return chain.invoke({"content": content})
+
+    def _create_chain(self, parser_pydantic_object: Type[BaseModel]):
         system_message = f"""
         You are an expert at parsinglog entries. You will be provided with a text
         snippet and you will need to parse out the relevant information. When parsing 
@@ -45,14 +53,6 @@ class Parser:
         )
 
         return prompt | model | parser
-
-    def parse(self, content: str):
-        if self.response_format.__origin__ is list:
-            chain = self.create_chain(self._create_items_model(self.response_format))
-            return chain.invoke({"content": content}).items
-        else:
-            chain = self.create_chain(self.response_format)
-            return chain.invoke({"content": content})
 
     @staticmethod
     def _create_items_model(obj: Type[list[BaseModel]]):
