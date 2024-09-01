@@ -2,8 +2,7 @@ import os
 from datetime import datetime
 from enum import Enum
 
-from capture.llm import Parser
-from capture.notes.content_generator import ContentGenerator
+from capture.llm import Categorizer, Integrator, Parser
 from capture.notes.food_log import FoodLog, FoodLogEntry
 
 
@@ -17,7 +16,6 @@ class NotesService:
     def __init__(self, notes_directory: str, food_log_path: str) -> None:
         self.notes_directory = notes_directory
         self.food_log_path = food_log_path
-        self.content_generator = ContentGenerator()
 
     def get_or_create_daily_note(self) -> str:
         file_name = f"{datetime.now().strftime('%Y-%m-%d')}.md"
@@ -30,9 +28,8 @@ class NotesService:
         with open(file_path, "r") as f:
             existing_content = f.read()
 
-        updated_content = self.content_generator.integrate_content(
-            existing_content, new_content
-        )
+        integrator = Integrator(existing_content)
+        updated_content = integrator.integrate_markdown(new_content)
         self.write(updated_content, file_path)
 
     def write(self, content: str, note_path: str):
@@ -50,9 +47,8 @@ class NotesService:
         log.add_entries(entries)
 
     def get_note_type(self, content: str) -> NoteType:
-        return self.content_generator.choose_category(
-            content, [NoteType.FOOD_LOG, NoteType.OTHER]
-        )
+        categorizer = Categorizer([NoteType.FOOD_LOG, NoteType.OTHER])
+        return categorizer.categorize(content)
 
     def add_content(self, content: str):
         match self.get_note_type(content):
