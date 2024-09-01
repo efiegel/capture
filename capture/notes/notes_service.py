@@ -2,8 +2,10 @@ import os
 from datetime import datetime
 from enum import Enum
 
+from capture.llm import Parser
 from capture.notes.content_generator import ContentGenerator
-from capture.notes.food_log import FoodLog
+from capture.notes.food_log import FoodLog, FoodLogEntry
+from capture.settings import VECTORSTORE_PATH
 
 
 class NoteType(str, Enum):
@@ -43,7 +45,8 @@ class NotesService:
         self.update_note(daily_note, content)
 
     def add_content_to_food_log(self, content: str):
-        entries = self.content_generator.parse_food_log_entries(content)
+        parser = Parser(list[FoodLogEntry], VECTORSTORE_PATH)
+        entries = parser.parse(content)
         log = FoodLog(self.food_log_path)
         log.add_entries(entries)
 

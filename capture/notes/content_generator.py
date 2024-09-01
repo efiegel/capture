@@ -1,19 +1,10 @@
-from langchain_chroma import Chroma
 from langchain_core.messages import HumanMessage, SystemMessage
-from langchain_openai import ChatOpenAI, OpenAIEmbeddings
-
-from capture.llm import Parser
-from capture.notes.food_log import FoodLogEntry
-from capture.settings import VECTORSTORE_PATH
+from langchain_openai import ChatOpenAI
 
 
 class ContentGenerator:
     def __init__(self):
         self.model = ChatOpenAI(model="gpt-4o-mini")
-        self.vectorstore = Chroma(
-            persist_directory=VECTORSTORE_PATH,
-            embedding_function=OpenAIEmbeddings(),
-        )
 
     def choose_category(self, content: str, categories: list[str]) -> str:
         system_message = """
@@ -29,10 +20,6 @@ class ContentGenerator:
         response = self.model.invoke(messages)
 
         return response.content
-
-    def parse_food_log_entries(self, content: str) -> list[FoodLogEntry]:
-        parser = Parser(list[FoodLogEntry], VECTORSTORE_PATH)
-        return parser.parse(content)
 
     def integrate_content(self, existing_content: str, new_content: str) -> str:
         system_message = """
