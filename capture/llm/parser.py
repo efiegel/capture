@@ -7,7 +7,7 @@ from langchain_core.prompts import PromptTemplate
 from langchain_openai import ChatOpenAI
 from pydantic import BaseModel, create_model
 
-from capture.rag import vectorstore
+from capture.llm.rag import vectorstore
 
 
 class Parser:
