@@ -13,3 +13,9 @@ def load_csv_data(file_path):
         embedding=OpenAIEmbeddings(),
         persist_directory=VECTORSTORE_PATH,
     )
+
+
+vectorstore = Chroma(
+    persist_directory=VECTORSTORE_PATH,
+    embedding_function=OpenAIEmbeddings(),
+)

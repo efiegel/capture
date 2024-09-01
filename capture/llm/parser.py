@@ -2,21 +2,20 @@ from datetime import datetime
 from typing import List, Type, Union
 
 from langchain.output_parsers import PydanticOutputParser
-from langchain_chroma import Chroma
 from langchain_core.documents import Document
 from langchain_core.prompts import PromptTemplate
-from langchain_openai import ChatOpenAI, OpenAIEmbeddings
+from langchain_openai import ChatOpenAI
 from pydantic import BaseModel, create_model
+
+from capture.rag import vectorstore
 
 
 class Parser:
     def __init__(
         self,
         response_format: Union[Type[BaseModel], Type[list[BaseModel]]],
-        vectorstore_directory: str,
     ):
         self.response_format = response_format
-        self.vectorstore_directory = vectorstore_directory
 
     def parse(self, content: str):
         if self.response_format.__origin__ is list:
@@ -34,11 +33,6 @@ class Parser:
         know that it should be for today, {datetime.now()}. You may also be provided 
         additional relevant context to aid your parsing task.
         """
-
-        vectorstore = Chroma(
-            persist_directory=self.vectorstore_directory,
-            embedding_function=OpenAIEmbeddings(),
-        )
 
         parser = PydanticOutputParser(pydantic_object=parser_pydantic_object)
         model = ChatOpenAI(model="gpt-4o-mini")
