@@ -14,11 +14,6 @@ from capture.settings import VECTORSTORE_PATH
 class Parser:
     def __init__(self, response_format: Union[Type[BaseModel], Type[list[BaseModel]]]):
         self.response_format = response_format
-        self.model = ChatOpenAI(model="gpt-4o-mini")
-        self.vectorstore = Chroma(
-            persist_directory=VECTORSTORE_PATH,
-            embedding_function=OpenAIEmbeddings(),
-        )
 
     def create_chain(self, parser_pydantic_object: Type[BaseModel]):
         system_message = f"""
@@ -29,19 +24,23 @@ class Parser:
         additional relevant context to aid your parsing task.
         """
 
-        parser = PydanticOutputParser(pydantic_object=parser_pydantic_object)
+        vectorstore = Chroma(
+            persist_directory=VECTORSTORE_PATH, embedding_function=OpenAIEmbeddings()
+        )
 
+        parser = PydanticOutputParser(pydantic_object=parser_pydantic_object)
+        model = ChatOpenAI(model="gpt-4o-mini")
         prompt = PromptTemplate(
             template="{system_message}\n{format_instructions}\n{context}\n{content}\n",
             input_variables=["content"],
             partial_variables={
                 "system_message": system_message,
                 "format_instructions": parser.get_format_instructions(),
-                "context": self.vectorstore.as_retriever() | format_docs,
+                "context": vectorstore.as_retriever() | format_docs,
             },
         )
 
-        return prompt | self.model | parser
+        return prompt | model | parser
 
     def parse(self, content: str):
         if self.response_format.__origin__ is list:
