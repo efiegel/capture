@@ -10,10 +10,7 @@ from capture.llm.rag import format_docs, vectorstore
 
 
 class Parser:
-    def __init__(
-        self,
-        response_format: Union[Type[BaseModel], Type[list[BaseModel]]],
-    ):
+    def __init__(self, response_format: Union[Type[BaseModel], Type[list[BaseModel]]]):
         self.response_format = response_format
 
     def parse(self, content: str):
