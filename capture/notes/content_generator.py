@@ -31,7 +31,7 @@ class ContentGenerator:
         return response.content
 
     def parse_food_log_entries(self, content: str) -> list[FoodLogEntry]:
-        parser = Parser(list[FoodLogEntry])
+        parser = Parser(list[FoodLogEntry], VECTORSTORE_PATH)
         return parser.parse(content)
 
     def integrate_content(self, existing_content: str, new_content: str) -> str:

@@ -8,12 +8,15 @@ from langchain_core.prompts import PromptTemplate
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from pydantic import BaseModel, create_model
 
-from capture.settings import VECTORSTORE_PATH
-
 
 class Parser:
-    def __init__(self, response_format: Union[Type[BaseModel], Type[list[BaseModel]]]):
+    def __init__(
+        self,
+        response_format: Union[Type[BaseModel], Type[list[BaseModel]]],
+        vectorstore_directory: str,
+    ):
         self.response_format = response_format
+        self.vectorstore_directory = vectorstore_directory
 
     def create_chain(self, parser_pydantic_object: Type[BaseModel]):
         system_message = f"""
@@ -25,7 +28,8 @@ class Parser:
         """
 
         vectorstore = Chroma(
-            persist_directory=VECTORSTORE_PATH, embedding_function=OpenAIEmbeddings()
+            persist_directory=self.vectorstore_directory,
+            embedding_function=OpenAIEmbeddings(),
         )
 
         parser = PydanticOutputParser(pydantic_object=parser_pydantic_object)
