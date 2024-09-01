@@ -2,7 +2,7 @@ from unittest.mock import Mock, patch
 
 from langchain_openai import OpenAIEmbeddings
 
-from capture.llm.vectorstore import format_docs, load_csv_data
+from capture.llm.rag import format_docs, load_csv_data
 from capture.settings import VECTORSTORE_PATH
 
 
