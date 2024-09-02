@@ -1,30 +1,12 @@
 import csv
 import os
 from datetime import datetime
-from unittest.mock import MagicMock, patch
 
 import pytest
 import time_machine
-from langchain_core.messages import BaseMessage
 
 from capture.notes.notes_service import NotesService
-
-
-def patch_model_responses(responses):
-    return patch(
-        "langchain_openai.ChatOpenAI.invoke",
-        side_effect=[
-            MagicMock(spec=BaseMessage, content=response, text=str(response))
-            for response in responses
-        ],
-    )
-
-
-def patch_json_parsing(result):
-    return patch(
-        "langchain_core.output_parsers.json.JsonOutputParser.parse_result",
-        side_effect=[result],
-    )
+from tests.utils import patch_json_parsing, patch_model_responses
 
 
 class TestNotesService:
@@ -98,7 +80,7 @@ class TestNotesService:
         # end of the chain; hence the None model response patch. Could wrap the chain
         # and mock the entire thing if desired, this is all a product of the | syntax.
         with patch_model_responses(["food_log", None]):
-            with patch_json_parsing({"entries": entry_list}):
+            with patch_json_parsing({"items": entry_list}):
                 notes_service.add_content("I ate an apple at lunch.")
 
         with open(food_log, mode="r", newline="") as f:
