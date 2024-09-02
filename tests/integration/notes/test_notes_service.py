@@ -1,24 +1,12 @@
 import csv
 import os
 from datetime import datetime
-from unittest.mock import MagicMock, patch
 
 import pytest
 import time_machine
-from langchain_core.messages import BaseMessage
 
 from capture.notes.notes_service import NotesService
-from tests.utils import patch_json_parsing
-
-
-def patch_model_responses(responses):
-    return patch(
-        "langchain_openai.ChatOpenAI.invoke",
-        side_effect=[
-            MagicMock(spec=BaseMessage, content=response, text=str(response))
-            for response in responses
-        ],
-    )
+from tests.utils import patch_json_parsing, patch_model_responses
 
 
 class TestNotesService:
