@@ -29,3 +29,6 @@ class IntegratorChain:
         )
 
         return prompt | ChatOpenAI(model="gpt-4o-mini")
+
+    def invoke(self, *args, **kwargs):
+        return self.chain.invoke(*args, **kwargs)

@@ -42,3 +42,6 @@ class ParserChain:
         )
 
         return prompt | self.model | parser
+
+    def invoke(self, *args, **kwargs):
+        return self.chain.invoke(*args, **kwargs)

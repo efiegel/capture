@@ -27,3 +27,6 @@ class CategorizerChain:
         )
 
         return prompt | self.model
+
+    def invoke(self, *args, **kwargs):
+        return self.chain.invoke(*args, **kwargs)
