@@ -14,12 +14,12 @@ class Parser:
         self.response_format = response_format
 
     def parse(self, content: str):
-        if self.response_format.__origin__ is list:
-            chain = self._create_chain(self._create_items_model(self.response_format))
-            return chain.invoke({"content": content}).items
-        else:
+        if self.response_format.__class__ == BaseModel.__class__:
             chain = self._create_chain(self.response_format)
             return chain.invoke({"content": content})
+        else:
+            chain = self._create_chain(self._create_items_model(self.response_format))
+            return chain.invoke({"content": content}).items
 
     def _create_chain(self, parser_pydantic_object: Type[BaseModel]):
         system_message = f"""
