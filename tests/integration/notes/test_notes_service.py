@@ -8,7 +8,6 @@ import time_machine
 from langchain_core.messages import BaseMessage
 
 from capture.notes.notes_service import NotesService
-from tests.utils import patch_json_parsing
 
 
 def patch_model_responses(responses):
@@ -18,6 +17,13 @@ def patch_model_responses(responses):
             MagicMock(spec=BaseMessage, content=response, text=str(response))
             for response in responses
         ],
+    )
+
+
+def patch_json_parsing(result):
+    return patch(
+        "langchain_core.output_parsers.json.JsonOutputParser.parse_result",
+        side_effect=[result],
     )
 
 

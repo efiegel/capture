@@ -1,10 +1,16 @@
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 import pytest
 from pydantic import BaseModel
 
 from capture.llm import Parser
-from tests.utils import patch_json_parsing
+
+
+def patch_json_parsing(result):
+    return patch(
+        "langchain_core.output_parsers.json.JsonOutputParser.parse_result",
+        side_effect=[result],
+    )
 
 
 class TestParser:
