@@ -3,6 +3,9 @@ from langchain_openai import ChatOpenAI
 
 
 class CategorizerChain:
+    def __init__(self, model: ChatOpenAI):
+        self.model = model
+
     @property
     def chain(self):
         system_message = """
@@ -23,4 +26,4 @@ class CategorizerChain:
             partial_variables={"system_message": system_message},
         )
 
-        return prompt | ChatOpenAI(model="gpt-4o-mini")
+        return prompt | self.model

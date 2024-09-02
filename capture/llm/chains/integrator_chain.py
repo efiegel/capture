@@ -3,6 +3,9 @@ from langchain_openai import ChatOpenAI
 
 
 class IntegratorChain:
+    def __init__(self, model: ChatOpenAI):
+        self.model = model
+
     @property
     def chain(self):
         system_message = """

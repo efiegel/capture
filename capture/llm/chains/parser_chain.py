@@ -9,7 +9,8 @@ from capture.llm.rag import format_docs, vectorstore
 
 
 class ParserChain:
-    def __init__(self, response_format: BaseModel):
+    def __init__(self, model: ChatOpenAI, response_format: BaseModel):
+        self.model = model
         self.response_format = response_format
 
     @property
@@ -40,4 +41,4 @@ class ParserChain:
             },
         )
 
-        return prompt | ChatOpenAI(model="gpt-4o-mini") | parser
+        return prompt | self.model | parser
