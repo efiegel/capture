@@ -1,27 +1,20 @@
 from datetime import datetime
-from typing import List, Type, Union
 
 from langchain.output_parsers import PydanticOutputParser
 from langchain_core.prompts import PromptTemplate
 from langchain_openai import ChatOpenAI
-from pydantic import BaseModel, create_model
+from pydantic import BaseModel
 
 from capture.llm.rag import format_docs, vectorstore
 
 
-class Parser:
-    def __init__(self, response_format: Union[Type[BaseModel], Type[list[BaseModel]]]):
+class ParserChain:
+    def __init__(self, model: ChatOpenAI, response_format: BaseModel):
+        self.model = model
         self.response_format = response_format
 
-    def parse(self, content: str):
-        if self.response_format.__class__ == BaseModel.__class__:
-            chain = self._create_chain(self.response_format)
-            return chain.invoke({"content": content})
-        else:
-            chain = self._create_chain(self._create_items_model(self.response_format))
-            return chain.invoke({"content": content}).items
-
-    def _create_chain(self, parser_pydantic_object: Type[BaseModel]):
+    @property
+    def chain(self):
         system_message = f"""
         You are an expert at parsinglog entries. You will be provided with a text
         snippet and you will need to parse out the relevant information. When parsing 
@@ -30,10 +23,16 @@ class Parser:
         additional relevant context to aid your parsing task.
         """
 
-        parser = PydanticOutputParser(pydantic_object=parser_pydantic_object)
-        model = ChatOpenAI(model="gpt-4o-mini")
+        template = """"
+        {system_message}
+        {format_instructions}
+        {context}
+        {content}
+        """
+
+        parser = PydanticOutputParser(pydantic_object=self.response_format)
         prompt = PromptTemplate(
-            template="{system_message}\n{format_instructions}\n{context}\n{content}\n",
+            template=template,
             input_variables=["content"],
             partial_variables={
                 "system_message": system_message,
@@ -42,8 +41,7 @@ class Parser:
             },
         )
 
-        return prompt | model | parser
+        return prompt | self.model | parser
 
-    @staticmethod
-    def _create_items_model(obj: Type[list[BaseModel]]):
-        return create_model("Items", items=(List[obj.__args__[0]], ...))
+    def invoke(self, *args, **kwargs):
+        return self.chain.invoke(*args, **kwargs)
