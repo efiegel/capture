@@ -1,10 +1,10 @@
+from langchain.chains.base import Chain
 from langchain_core.prompts import PromptTemplate
 from langchain_openai import ChatOpenAI
 
 
-class CategorizerChain:
-    def __init__(self, model: ChatOpenAI):
-        self.model = model
+class CategorizerChain(Chain):
+    model: ChatOpenAI
 
     @property
     def chain(self):
@@ -28,5 +28,14 @@ class CategorizerChain:
 
         return prompt | self.model
 
-    def invoke(self, *args, **kwargs):
-        return self.chain.invoke(*args, **kwargs)
+    @property
+    def input_keys(self) -> list[str]:
+        return ["content", "categories"]
+
+    @property
+    def output_keys(self) -> list[str]:
+        return ["category"]
+
+    def _call(self, inputs):
+        response = self.chain.invoke(inputs)
+        return {"category": response.content}

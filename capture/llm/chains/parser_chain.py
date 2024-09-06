@@ -1,5 +1,7 @@
 from datetime import datetime
+from typing import Type
 
+from langchain.chains.base import Chain
 from langchain.output_parsers import PydanticOutputParser
 from langchain_core.prompts import PromptTemplate
 from langchain_openai import ChatOpenAI
@@ -8,10 +10,9 @@ from pydantic import BaseModel
 from capture.llm.rag import format_docs, vectorstore
 
 
-class ParserChain:
-    def __init__(self, model: ChatOpenAI, response_format: BaseModel):
-        self.model = model
-        self.response_format = response_format
+class ParserChain(Chain):
+    model: ChatOpenAI
+    response_format: Type[BaseModel]
 
     @property
     def chain(self):
@@ -43,5 +44,14 @@ class ParserChain:
 
         return prompt | self.model | parser
 
-    def invoke(self, *args, **kwargs):
-        return self.chain.invoke(*args, **kwargs)
+    @property
+    def input_keys(self) -> list[str]:
+        return ["content"]
+
+    @property
+    def output_keys(self) -> list[str]:
+        return ["content"]
+
+    def _call(self, inputs):
+        response = self.chain.invoke(inputs)
+        return {"content": response}
