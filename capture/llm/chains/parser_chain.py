@@ -50,8 +50,8 @@ class ParserChain(Chain):
 
     @property
     def output_keys(self) -> list[str]:
-        return ["content"]
+        return ["parsed_content"]
 
     def _call(self, inputs):
         response = self.chain.invoke(inputs)
-        return {"content": response}
+        return {"parsed_content": response}

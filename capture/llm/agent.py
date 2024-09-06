@@ -29,11 +29,11 @@ class Agent:
     ):
         if response_format.__class__ == BaseModel.__class__:
             chain = ParserChain(model=self.model, response_format=response_format)
-            return chain.invoke({"content": content}).get("content")
+            return chain.invoke({"content": content}).get("parsed_content")
         else:
             items_model = self._create_items_model(response_format)
             chain = ParserChain(model=self.model, response_format=items_model)
-            return chain.invoke({"content": content}).get("content").items
+            return chain.invoke({"content": content}).get("parsed_content").items
 
     @staticmethod
     def _create_items_model(obj: Type[list[BaseModel]]):
