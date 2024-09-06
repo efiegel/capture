@@ -1,10 +1,10 @@
+from langchain.chains.base import Chain
 from langchain_core.prompts import PromptTemplate
 from langchain_openai import ChatOpenAI
 
 
-class IntegratorChain:
-    def __init__(self, model: ChatOpenAI):
-        self.model = model
+class IntegratorChain(Chain):
+    model: ChatOpenAI
 
     @property
     def chain(self):
@@ -28,7 +28,16 @@ class IntegratorChain:
             partial_variables={"system_message": system_message},
         )
 
-        return prompt | ChatOpenAI(model="gpt-4o-mini")
+        return prompt | self.model
 
-    def invoke(self, *args, **kwargs):
-        return self.chain.invoke(*args, **kwargs)
+    @property
+    def input_keys(self) -> list[str]:
+        return ["existing_content", "new_content"]
+
+    @property
+    def output_keys(self) -> list[str]:
+        return ["updated_content"]
+
+    def _call(self, inputs):
+        response = self.chain.invoke(inputs)
+        return {"updated_content": response.content}
