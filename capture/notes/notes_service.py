@@ -51,6 +51,23 @@ class NotesService:
         categories = [NoteType.FOOD_LOG, NoteType.OTHER]
         return self.agent.categorize(content, categories)
 
+    def _list_files_in_directory(self, directory: str):
+        files = []
+        for root, dirs, filenames in os.walk(directory):
+            dirs[:] = [d for d in dirs if not d.startswith(".")]
+            for filename in filenames:
+                if not filename.startswith("."):
+                    files.append(os.path.join(root, filename))
+        return files
+
+    def _drop_common_file_root(self, files: list[str], root: str):
+        root = os.path.expanduser(root)
+        return [os.path.relpath(file, root) for file in files]
+
+    def _get_note_files(self):
+        files = self._list_files_in_directory(self.notes_directory)
+        return self._drop_common_file_root(files, self.notes_directory)
+
     def add_content(self, content: str):
         match self.get_note_type(content):
             case NoteType.FOOD_LOG:
