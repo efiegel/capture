@@ -4,7 +4,6 @@ from langchain_openai import ChatOpenAI
 from pydantic import BaseModel, create_model
 
 from .chains import (
-    CategorizerChain,
     FileSelectorChain,
     IntegratorChain,
     ParserChain,
@@ -15,12 +14,6 @@ from .chains import (
 class Agent:
     def __init__(self, model_name: str):
         self.model = ChatOpenAI(model=model_name)
-
-    def categorize(self, content: str, categories: list[str]) -> str:
-        chain = CategorizerChain(model=self.model)
-        inputs = {"content": content, "categories": categories}
-        response = chain.invoke(inputs)
-        return response.get("category")
 
     def integrate(self, existing_content: str, new_content: str):
         chain = IntegratorChain(model=self.model)
