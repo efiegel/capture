@@ -6,9 +6,8 @@ from capture.notes.CSVNote import CSVNote
 
 
 class NotesService:
-    def __init__(self, notes_directory: str, food_log_path: str) -> None:
+    def __init__(self, notes_directory: str) -> None:
         self.notes_directory = notes_directory
-        self.food_log_path = food_log_path
         self.agent = Agent("gpt-4o-mini")
 
     def get_or_create_daily_note(self) -> str:

@@ -54,7 +54,7 @@ class TestNotesService:
         daily_note = f"{tmp_path}/daily_notes/{datetime.now().strftime('%Y-%m-%d')}.md"
         assert os.path.exists(daily_note) is False
 
-        notes_service = NotesService(tmp_path, "tests/sample_data/food.csv")
+        notes_service = NotesService(tmp_path)
         integrated_content = "This is a sample note.\n\nMore content!"
         with patch_model_responses([daily_note, integrated_content]):
             notes_service.add_content("New content for a new note!")
@@ -66,7 +66,7 @@ class TestNotesService:
 
     @time_machine.travel(datetime(1985, 10, 26))
     def test_add_content_writes_to_existing_daily_note(self, tmp_path, daily_note):
-        notes_service = NotesService(tmp_path, "tests/sample_data/food.csv")
+        notes_service = NotesService(tmp_path)
         integrated_content = "This is a sample note.\n\nMore content!"
         with patch_model_responses([daily_note, integrated_content]):
             notes_service.add_content("More content!")
@@ -77,7 +77,7 @@ class TestNotesService:
         assert content == integrated_content
 
     def test_add_content_writes_to_food_log(self, tmp_path, food_log):
-        notes_service = NotesService(tmp_path, food_log)
+        notes_service = NotesService(tmp_path)
         entry_list = [
             {
                 "time": "12:00",
