@@ -27,8 +27,25 @@ class TestNotesService:
     @pytest.fixture
     def food_log(self, tmp_path):
         file = f"{tmp_path}/food_log.csv"
+
         with open(file, "w") as f:
-            csv.writer(f).writerow(["time", "name", "qty", "unit"])
+            csv.writer(f).writerow(
+                [
+                    "time",
+                    "name",
+                    "qty",
+                    "unit",
+                    "calories",
+                    "protein_grams",
+                    "fat_grams",
+                    "carbs_grams",
+                    "sodium_mg",
+                ]
+            )
+            csv.writer(f).writerow(
+                ["1985-10-26 9:00", "pear", 1, "whole", 100.0, 0.5, 0.3, 22.0, 2.0]
+            )
+
         yield file
 
     @time_machine.travel(datetime(1985, 10, 26))
@@ -75,11 +92,16 @@ class TestNotesService:
             }
         ]
 
+        schema_str = (
+            "time: str, name: str, qty: float, unit: str, calories: float, protein_gr"
+            "ams: float, fat_grams: float, carbs_grams: float, sodium_mg: float"
+        )
+
         # need to patch the model call that parses the food log entries so that the api
         # isn't actually called, but also patching the parsed result which is the actual
         # end of the chain; hence the None model response patch. Could wrap the chain
         # and mock the entire thing if desired, this is all a product of the | syntax.
-        with patch_model_responses(["food_log", None]):
+        with patch_model_responses(["food_log", schema_str, None]):
             with patch_json_parsing({"items": entry_list}):
                 notes_service.add_content("I ate an apple at lunch.")
 
@@ -88,6 +110,6 @@ class TestNotesService:
             next(reader)  # skip header
             entries = [row for row in reader]
 
-        assert entries == [
+        assert entries[1] == (
             ["12:00", "apple", "1.0", "whole", "95.0", "0.5", "0.3", "25.0", "2.0"]
-        ]
+        )
