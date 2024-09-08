@@ -56,7 +56,7 @@ class TestNotesService:
 
         notes_service = NotesService(tmp_path, "tests/sample_data/food.csv")
         integrated_content = "This is a sample note.\n\nMore content!"
-        with patch_model_responses(["daily_note", integrated_content]):
+        with patch_model_responses([daily_note, integrated_content]):
             notes_service.add_content("New content for a new note!")
 
         with open(daily_note, "r") as f:
@@ -68,7 +68,7 @@ class TestNotesService:
     def test_add_content_writes_to_existing_daily_note(self, tmp_path, daily_note):
         notes_service = NotesService(tmp_path, "tests/sample_data/food.csv")
         integrated_content = "This is a sample note.\n\nMore content!"
-        with patch_model_responses(["daily_note", integrated_content]):
+        with patch_model_responses([daily_note, integrated_content]):
             notes_service.add_content("More content!")
 
         with open(daily_note, "r") as f:
@@ -101,7 +101,7 @@ class TestNotesService:
         # isn't actually called, but also patching the parsed result which is the actual
         # end of the chain; hence the None model response patch. Could wrap the chain
         # and mock the entire thing if desired, this is all a product of the | syntax.
-        with patch_model_responses(["food_log", schema_str, None]):
+        with patch_model_responses([food_log, schema_str, None]):
             with patch_json_parsing({"items": entry_list}):
                 notes_service.add_content("I ate an apple at lunch.")
 

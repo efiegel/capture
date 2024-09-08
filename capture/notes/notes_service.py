@@ -1,15 +1,8 @@
 import os
 from datetime import datetime
-from enum import Enum
 
 from capture.llm import Agent
 from capture.notes.CSVNote import CSVNote
-
-
-class NoteType(str, Enum):
-    DAILY = "daily"
-    FOOD_LOG = "food_log"
-    OTHER = "other"
 
 
 class NotesService:
@@ -40,16 +33,12 @@ class NotesService:
         daily_note = self.get_or_create_daily_note()
         self.update_note(daily_note, content)
 
-    def add_content_to_food_log(self, content: str):
-        log = CSVNote(self.food_log_path)
-        csv_data = log.get_first_n_lines(5)
+    def add_content_to_csv_note(self, file_path: str, content: str):
+        note = CSVNote(file_path)
+        csv_data = note.get_first_n_lines(5)
         schema = self.agent.infer_csv_schema(csv_data)
         entries = self.agent.parse(content, list[schema])
-        log.add_entries(entries)
-
-    def get_note_type(self, content: str) -> NoteType:
-        categories = [NoteType.FOOD_LOG, NoteType.OTHER]
-        return self.agent.categorize(content, categories)
+        note.add_entries(entries)
 
     def _list_files_in_directory(self, directory: str):
         files = []
@@ -69,8 +58,8 @@ class NotesService:
         return self._drop_common_file_root(files, self.notes_directory)
 
     def add_content(self, content: str):
-        match self.get_note_type(content):
-            case NoteType.FOOD_LOG:
-                self.add_content_to_food_log(content)
-            case _:
-                self.add_content_to_daily_note(content)
+        file = self.agent.select_file(content, self._get_note_files())
+        if file.endswith(".csv"):
+            self.add_content_to_csv_note(file, content)
+        else:
+            self.add_content_to_daily_note(content)
