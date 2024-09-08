@@ -3,7 +3,7 @@ from typing import List, Type, Union
 from langchain_openai import ChatOpenAI
 from pydantic import BaseModel, create_model
 
-from .chains import CategorizerChain, IntegratorChain, ParserChain
+from .chains import CategorizerChain, IntegratorChain, ParserChain, SchemaInferenceChain
 
 
 class Agent:
@@ -21,6 +21,11 @@ class Agent:
         inputs = {"existing_content": existing_content, "new_content": new_content}
         response = chain.invoke(inputs)
         return response.get("updated_content")
+
+    def infer_csv_schema(self, csv_data: str) -> Type[BaseModel]:
+        chain = SchemaInferenceChain(model=self.model)
+        response = chain.invoke({"csv_data": csv_data})
+        return response.get("schema")
 
     def parse(
         self,

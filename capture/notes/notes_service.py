@@ -3,7 +3,7 @@ from datetime import datetime
 from enum import Enum
 
 from capture.llm import Agent
-from capture.notes.food_log import FoodLog, FoodLogEntry
+from capture.notes.food_log import FoodLog
 
 
 class NoteType(str, Enum):
@@ -41,8 +41,10 @@ class NotesService:
         self.update_note(daily_note, content)
 
     def add_content_to_food_log(self, content: str):
-        entries = self.agent.parse(content, list[FoodLogEntry])
         log = FoodLog(self.food_log_path)
+        csv_data = log.get_first_n_lines(5)
+        schema = self.agent.infer_csv_schema(csv_data)
+        entries = self.agent.parse(content, list[schema])
         log.add_entries(entries)
 
     def get_note_type(self, content: str) -> NoteType:
