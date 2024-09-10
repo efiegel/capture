@@ -19,7 +19,8 @@ class FileSelectorChain(Chain):
         new file name that maintains a consistent naming convention and path structure 
         with the other files that you have been supplied with. If you choose to create a
         new file, name it as if it already existed: don't name it 'new' or anything. For
-        your reference, today is {datetime.now()}. Only return the chosen file path.
+        your reference, today is {datetime.now()}. Only return the chosen file path, and
+        don't include any string-wrapping characters like `, ', or ".
         """
 
         template = """
