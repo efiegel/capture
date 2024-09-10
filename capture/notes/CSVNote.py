@@ -14,6 +14,11 @@ class CSVNote:
             for entry in entries:
                 writer.writerow(list(entry.model_dump().values()))
 
+    def write_headers(self, headers: list[str]):
+        with open(self.path, mode="a", newline="") as file:
+            writer = csv.writer(file)
+            writer.writerow(headers)
+
     def get_first_n_lines(self, n: int):
         with open(self.path, mode="r", newline="") as file:
             reader = csv.reader(file)
