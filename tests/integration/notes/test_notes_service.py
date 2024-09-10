@@ -113,3 +113,25 @@ class TestNotesService:
         assert entries[1] == (
             ["12:00", "apple", "1.0", "whole", "95.0", "0.5", "0.3", "25.0", "2.0"]
         )
+
+    def test_add_content_writes_to_new_log(self, tmp_path):
+        notes_service = NotesService(tmp_path)
+
+        new_file_path = f"{tmp_path}/sleep_log.csv"
+        schema_str = "asleep: str, awake: str"
+        entry_list = [{"asleep": "2024-01-01 22:00", "awake": "2024-01-02 06:00"}]
+
+        with patch_model_responses([new_file_path, schema_str, None]):
+            with patch_json_parsing({"items": entry_list}):
+                notes_service.add_content(
+                    "New sleep log! Went to bed at 10pm and woke up at 6am."
+                )
+
+        with open(new_file_path, mode="r", newline="") as f:
+            reader = csv.reader(f)
+            entries = [row for row in reader]
+
+        assert entries == [
+            ["asleep", "awake"],
+            ["2024-01-01 22:00", "2024-01-02 06:00"],
+        ]
