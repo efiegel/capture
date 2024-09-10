@@ -35,13 +35,13 @@ class NotesService:
 
     def add_content_to_csv_note(self, file_path: str, content: str):
         note = CSVNote(file_path)
-        first_lines = note.get_first_n_lines(5)
+        first_lines = note.read()[:5]
         csv_data = first_lines or content
         schema = self.agent.infer_csv_schema(csv_data)
         entries = self.agent.parse(content, list[schema])
         if not first_lines:
-            note.write_headers(list(schema.model_fields.keys()))
-        note.add_entries(entries)
+            note.write([list(schema.model_fields.keys())])
+        note.write([list(entry.model_dump().values()) for entry in entries])
 
     def add_content(self, content: str):
         file = self.agent.select_file(self.notes_directory, content)
