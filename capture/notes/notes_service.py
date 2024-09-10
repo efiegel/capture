@@ -45,10 +45,9 @@ class NotesService:
 
     def add_content(self, content: str):
         file = self.agent.select_file(self.notes_directory, content)
-        if not os.path.exists(file):
-            Path(file).touch()
-
         if file.endswith(".csv"):
+            if not os.path.exists(file):
+                Path(file).touch()
             self.add_content_to_csv_note(file, content)
         else:
             self.add_content_to_daily_note(content)
