@@ -1,3 +1,4 @@
+import os
 from typing import List, Type, Union
 
 from langchain_openai import ChatOpenAI
@@ -26,10 +27,14 @@ class Agent:
         response = chain.invoke({"csv_data": csv_data})
         return response.get("schema")
 
-    def select_file(self, content: str, files: list[str]) -> str:
+    def select_file(self, directory: str, content: str) -> str:
+        files_full_paths = self._list_files_in_directory(directory)
+        files = self._drop_common_path_root(files_full_paths, directory)
+
         chain = FileSelectorChain(model=self.model)
         response = chain.invoke({"content": content, "files": files})
-        return response.get("existing_file_path") or response.get("new_file_path")
+        file = response.get("existing_file_path") or response.get("new_file_path")
+        return os.path.join(directory, file)
 
     def parse(
         self,
@@ -47,3 +52,18 @@ class Agent:
     @staticmethod
     def _create_items_model(obj: Type[list[BaseModel]]):
         return create_model("Items", items=(List[obj.__args__[0]], ...))
+
+    @staticmethod
+    def _list_files_in_directory(directory: str):
+        files = []
+        for root, dirs, filenames in os.walk(directory):
+            dirs[:] = [d for d in dirs if not d.startswith(".")]
+            for filename in filenames:
+                if not filename.startswith("."):
+                    files.append(os.path.join(root, filename))
+        return files
+
+    @staticmethod
+    def _drop_common_path_root(files: list[str], root: str):
+        root = os.path.expanduser(root)
+        return [os.path.relpath(file, root) for file in files]
