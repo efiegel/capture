@@ -1,5 +1,6 @@
 import os
 from datetime import datetime
+from pathlib import Path
 
 from capture.llm import Agent
 from capture.notes.CSVNote import CSVNote
@@ -34,13 +35,16 @@ class NotesService:
 
     def add_content_to_csv_note(self, file_path: str, content: str):
         note = CSVNote(file_path)
-        csv_data = note.get_first_n_lines(5)
+        csv_data = note.get_first_n_lines(5) or content
         schema = self.agent.infer_csv_schema(csv_data)
         entries = self.agent.parse(content, list[schema])
         note.add_entries(entries)
 
     def add_content(self, content: str):
         file = self.agent.select_file(self.notes_directory, content)
+        if not os.path.exists(file):
+            Path(file).touch()
+
         if file.endswith(".csv"):
             self.add_content_to_csv_note(file, content)
         else:
