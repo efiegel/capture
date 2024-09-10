@@ -1,21 +1,14 @@
 import os
 from datetime import datetime
-from enum import Enum
+from pathlib import Path
 
 from capture.llm import Agent
-from capture.notes.food_log import FoodLog
-
-
-class NoteType(str, Enum):
-    DAILY = "daily"
-    FOOD_LOG = "food_log"
-    OTHER = "other"
+from capture.notes.CSVNote import CSVNote
 
 
 class NotesService:
-    def __init__(self, notes_directory: str, food_log_path: str) -> None:
+    def __init__(self, notes_directory: str) -> None:
         self.notes_directory = notes_directory
-        self.food_log_path = food_log_path
         self.agent = Agent("gpt-4o-mini")
 
     def get_or_create_daily_note(self) -> str:
@@ -40,20 +33,21 @@ class NotesService:
         daily_note = self.get_or_create_daily_note()
         self.update_note(daily_note, content)
 
-    def add_content_to_food_log(self, content: str):
-        log = FoodLog(self.food_log_path)
-        csv_data = log.get_first_n_lines(5)
+    def add_content_to_csv_note(self, file_path: str, content: str):
+        note = CSVNote(file_path)
+        first_lines = note.get_first_n_lines(5)
+        csv_data = first_lines or content
         schema = self.agent.infer_csv_schema(csv_data)
         entries = self.agent.parse(content, list[schema])
-        log.add_entries(entries)
-
-    def get_note_type(self, content: str) -> NoteType:
-        categories = [NoteType.FOOD_LOG, NoteType.OTHER]
-        return self.agent.categorize(content, categories)
+        if not first_lines:
+            note.write_headers(list(schema.model_fields.keys()))
+        note.add_entries(entries)
 
     def add_content(self, content: str):
-        match self.get_note_type(content):
-            case NoteType.FOOD_LOG:
-                self.add_content_to_food_log(content)
-            case _:
-                self.add_content_to_daily_note(content)
+        file = self.agent.select_file(self.notes_directory, content)
+        if file.endswith(".csv"):
+            if not os.path.exists(file):
+                Path(file).touch()
+            self.add_content_to_csv_note(file, content)
+        else:
+            self.add_content_to_daily_note(content)

@@ -1,20 +1,20 @@
+import os
 from typing import List, Type, Union
 
 from langchain_openai import ChatOpenAI
 from pydantic import BaseModel, create_model
 
-from .chains import CategorizerChain, IntegratorChain, ParserChain, SchemaInferenceChain
+from .chains import (
+    FileSelectorChain,
+    IntegratorChain,
+    ParserChain,
+    SchemaInferenceChain,
+)
 
 
 class Agent:
     def __init__(self, model_name: str):
         self.model = ChatOpenAI(model=model_name)
-
-    def categorize(self, content: str, categories: list[str]) -> str:
-        chain = CategorizerChain(model=self.model)
-        inputs = {"content": content, "categories": categories}
-        response = chain.invoke(inputs)
-        return response.get("category")
 
     def integrate(self, existing_content: str, new_content: str):
         chain = IntegratorChain(model=self.model)
@@ -26,6 +26,15 @@ class Agent:
         chain = SchemaInferenceChain(model=self.model)
         response = chain.invoke({"csv_data": csv_data})
         return response.get("schema")
+
+    def select_file(self, directory: str, content: str) -> str:
+        files_full_paths = self._list_files_in_directory(directory)
+        files = self._drop_common_path_root(files_full_paths, directory)
+
+        chain = FileSelectorChain(model=self.model)
+        response = chain.invoke({"content": content, "files": files})
+        file = response.get("existing_file_path") or response.get("new_file_path")
+        return os.path.join(directory, file)
 
     def parse(
         self,
@@ -43,3 +52,18 @@ class Agent:
     @staticmethod
     def _create_items_model(obj: Type[list[BaseModel]]):
         return create_model("Items", items=(List[obj.__args__[0]], ...))
+
+    @staticmethod
+    def _list_files_in_directory(directory: str):
+        files = []
+        for root, dirs, filenames in os.walk(directory):
+            dirs[:] = [d for d in dirs if not d.startswith(".")]
+            for filename in filenames:
+                if not filename.startswith("."):
+                    files.append(os.path.join(root, filename))
+        return files
+
+    @staticmethod
+    def _drop_common_path_root(files: list[str], root: str):
+        root = os.path.expanduser(root)
+        return [os.path.relpath(file, root) for file in files]

@@ -11,10 +11,14 @@ class SchemaInferenceChain(Chain):
     def chain(self):
         system_message = """
         You are an expert in data analysis and schema inference. You will be provided 
-        with the first few rows of a CSV file. Your task is to infer the schema of the 
-        CSV and return it in exactly this format: 'field_name: field_type, field_name: 
-        field_type, ...'. All names should be snake case. Types should be one of 'str',
-        'int', 'float', 'bool'. Return only the schema, nothing else.
+        with the first few rows of a CSV file. It's possible that you might actually
+        instead be passed a whole block of text that will eventally be written to a CSV.
+        If that is the case, pull out the relevant pieces of data that would be written 
+        to the CSV and ignore extraneous language describing the event or file itself. 
+        Your ultimate task is to infer the schema of the CSV and return it in exactly 
+        this format: 'field_name: field_type, field_name: field_type, ...'. All names 
+        should be snake case. Types should be one of 'str', 'int', 'float', 'bool'. 
+        Return only the schema, nothing else.
         """
 
         template = """

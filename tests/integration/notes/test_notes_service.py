@@ -54,9 +54,9 @@ class TestNotesService:
         daily_note = f"{tmp_path}/daily_notes/{datetime.now().strftime('%Y-%m-%d')}.md"
         assert os.path.exists(daily_note) is False
 
-        notes_service = NotesService(tmp_path, "tests/sample_data/food.csv")
+        notes_service = NotesService(tmp_path)
         integrated_content = "This is a sample note.\n\nMore content!"
-        with patch_model_responses(["daily_note", integrated_content]):
+        with patch_model_responses([daily_note, integrated_content]):
             notes_service.add_content("New content for a new note!")
 
         with open(daily_note, "r") as f:
@@ -66,9 +66,9 @@ class TestNotesService:
 
     @time_machine.travel(datetime(1985, 10, 26))
     def test_add_content_writes_to_existing_daily_note(self, tmp_path, daily_note):
-        notes_service = NotesService(tmp_path, "tests/sample_data/food.csv")
+        notes_service = NotesService(tmp_path)
         integrated_content = "This is a sample note.\n\nMore content!"
-        with patch_model_responses(["daily_note", integrated_content]):
+        with patch_model_responses([daily_note, integrated_content]):
             notes_service.add_content("More content!")
 
         with open(daily_note, "r") as f:
@@ -77,7 +77,7 @@ class TestNotesService:
         assert content == integrated_content
 
     def test_add_content_writes_to_food_log(self, tmp_path, food_log):
-        notes_service = NotesService(tmp_path, food_log)
+        notes_service = NotesService(tmp_path)
         entry_list = [
             {
                 "time": "12:00",
@@ -101,7 +101,7 @@ class TestNotesService:
         # isn't actually called, but also patching the parsed result which is the actual
         # end of the chain; hence the None model response patch. Could wrap the chain
         # and mock the entire thing if desired, this is all a product of the | syntax.
-        with patch_model_responses(["food_log", schema_str, None]):
+        with patch_model_responses([food_log, schema_str, None]):
             with patch_json_parsing({"items": entry_list}):
                 notes_service.add_content("I ate an apple at lunch.")
 
@@ -113,3 +113,25 @@ class TestNotesService:
         assert entries[1] == (
             ["12:00", "apple", "1.0", "whole", "95.0", "0.5", "0.3", "25.0", "2.0"]
         )
+
+    def test_add_content_writes_to_new_log(self, tmp_path):
+        notes_service = NotesService(tmp_path)
+
+        new_file_path = f"{tmp_path}/sleep_log.csv"
+        schema_str = "asleep: str, awake: str"
+        entry_list = [{"asleep": "2024-01-01 22:00", "awake": "2024-01-02 06:00"}]
+
+        with patch_model_responses([new_file_path, schema_str, None]):
+            with patch_json_parsing({"items": entry_list}):
+                notes_service.add_content(
+                    "New sleep log! Went to bed at 10pm and woke up at 6am."
+                )
+
+        with open(new_file_path, mode="r", newline="") as f:
+            reader = csv.reader(f)
+            entries = [row for row in reader]
+
+        assert entries == [
+            ["asleep", "awake"],
+            ["2024-01-01 22:00", "2024-01-02 06:00"],
+        ]

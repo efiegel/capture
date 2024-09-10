@@ -11,7 +11,7 @@ def add_content(file):
     with open(file, "r") as f:
         content = f.read()
 
-    notes = NotesService(settings.NOTES_DIRECTORY, settings.FOOD_LOG_PATH)
+    notes = NotesService(settings.NOTES_DIRECTORY)
     notes.add_content(content)
 
 

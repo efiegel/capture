@@ -14,7 +14,6 @@ TRANSCRIPTION_DIRECTORY = os.getenv("TRANSCRIPTION_DIRECTORY")
 # Note directories
 FILE_DIRECTORY = os.getenv("TRANSCRIPTION_DIRECTORY")
 NOTES_DIRECTORY = os.path.expanduser(os.getenv("NOTES_DIRECTORY", "")) or None
-FOOD_LOG_PATH = os.path.expanduser(os.getenv("FOOD_LOG_PATH", "")) or None
 
 # Vectorstore
 VECTORSTORE_PATH = os.getenv("VECTORSTORE_PATH")
