@@ -1,8 +1,13 @@
+import os
+
 from .BaseNote import BaseNote
 
 
 class TextNote(BaseNote[str]):
-    def read(self):
+    def read(self) -> str:
+        if not os.path.exists(self.file_path):
+            return ""
+
         with open(self.file_path, "r") as file:
             return file.read()
 

@@ -1,10 +1,14 @@
 import csv
+import os
 
 from .BaseNote import BaseNote
 
 
 class CSVNote(BaseNote[list[list[str]]]):
     def read(self) -> list[list[str]]:
+        if not os.path.exists(self.file_path):
+            return [[]]
+
         with open(self.file_path, newline="") as file:
             reader = csv.reader(file)
             return list(reader)
