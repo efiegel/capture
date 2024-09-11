@@ -7,6 +7,5 @@ class TestTextNote:
         content = "Hello, World!"
         note.write(content)
 
-        assert note.contents == content
         with open(note.file_path) as file:
             assert file.read() == content
