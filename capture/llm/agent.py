@@ -22,7 +22,7 @@ class Agent:
         response = chain.invoke(inputs)
         return response.get("updated_content")
 
-    def infer_csv_schema(self, data: str) -> Type[BaseModel]:
+    def infer_schema(self, data: str) -> Type[BaseModel]:
         chain = SchemaInferenceChain(model=self.model)
         response = chain.invoke({"data": data})
         return response.get("schema")
