@@ -1,3 +1,5 @@
+from typing import Optional
+
 from langchain.chains.base import Chain
 from langchain_core.prompts import PromptTemplate
 from langchain_openai import ChatOpenAI
@@ -61,7 +63,7 @@ class SchemaInferenceChain(Chain):
         schema_dict = {}
         for field in schema_string.replace(" ", "").split(","):
             name, type_str = field.split(":")
-            field_type = type_mapping.get(type_str)
+            field_type = Optional[type_mapping.get(type_str)]
             schema_dict[name] = (field_type, ...)
 
         return schema_dict
