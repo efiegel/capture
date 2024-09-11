@@ -19,9 +19,6 @@ class BaseNote(ABC, Generic[T]):
     def contents(self, new_content: T):
         self._contents = new_content
 
-    def save(self):
-        self.write(self._contents)
-
     @abstractmethod
     def read(self) -> T:
         pass
