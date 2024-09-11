@@ -3,7 +3,7 @@ from datetime import datetime
 from pathlib import Path
 
 from capture.llm import Agent
-from capture.notes.CSVNote import CSVNote
+from capture.notes import BaseNote, CSVNote, TextNote
 
 
 class NotesService:
@@ -33,8 +33,7 @@ class NotesService:
         daily_note = self.get_or_create_daily_note()
         self.update_note(daily_note, content)
 
-    def add_content_to_csv_note(self, file_path: str, content: str):
-        note = CSVNote(file_path)
+    def add_content_to_csv_note(self, note: CSVNote, content: str):
         first_lines = note.read()[:5]
         csv_data = first_lines or content
         schema = self.agent.infer_csv_schema(csv_data)
@@ -43,11 +42,18 @@ class NotesService:
             note.write([list(schema.model_fields.keys())])
         note.write([list(entry.model_dump().values()) for entry in entries])
 
+    def _get_or_init_note(self, file_path: str) -> BaseNote:
+        if not os.path.exists(file_path):
+            Path(file_path).touch()
+        if file_path.endswith(".csv"):
+            return CSVNote(file_path)
+        else:
+            return TextNote(file_path)
+
     def add_content(self, content: str):
         file = self.agent.select_file(self.notes_directory, content)
-        if file.endswith(".csv"):
-            if not os.path.exists(file):
-                Path(file).touch()
-            self.add_content_to_csv_note(file, content)
+        note = self._get_or_init_note(file)
+        if isinstance(note, CSVNote):
+            self.add_content_to_csv_note(note, content)
         else:
             self.add_content_to_daily_note(content)
