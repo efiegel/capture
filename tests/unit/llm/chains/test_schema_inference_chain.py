@@ -1,3 +1,5 @@
+from typing import Optional
+
 from langchain_openai import ChatOpenAI
 from pydantic import BaseModel
 
@@ -20,9 +22,9 @@ class TestSchemaInferenceChain:
             inferred_schema = chain.invoke({"data": data})["schema"]
 
         class InferredSchema(BaseModel):
-            first_name: str
-            age: int
-            city: str
+            first_name: Optional[str]
+            age: Optional[int]
+            city: Optional[str]
 
         assert issubclass(inferred_schema, BaseModel)
         assert inferred_schema.model_json_schema() == InferredSchema.model_json_schema()
