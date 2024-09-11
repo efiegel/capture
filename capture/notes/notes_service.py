@@ -17,8 +17,7 @@ class NotesService:
 
     def add_content_to_csv_note(self, note: CSVNote, content: str):
         first_lines = note.read()[:5]
-        csv_data = first_lines or content
-        schema = self.agent.infer_csv_schema(csv_data)
+        schema = self.agent.infer_csv_schema(first_lines or content)
         entries = self.agent.parse(content, list[schema])
         if not first_lines:
             note.write([list(schema.model_fields.keys())])
