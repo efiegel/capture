@@ -7,7 +7,7 @@ from tests.utils import patch_model_responses
 
 class TestSchemaInferenceChain:
     def test_schema_inference_chain(self):
-        csv_data = """
+        data = """
             First Name,age,city
             Alice,30,New York
             Bob,25,Los Angeles
@@ -17,7 +17,7 @@ class TestSchemaInferenceChain:
         model = ChatOpenAI(model="gpt-4o-mini")
         chain = SchemaInferenceChain(model=model)
         with patch_model_responses(["first_name: str, age: int, city: str"]):
-            inferred_schema = chain.invoke({"csv_data": csv_data})["schema"]
+            inferred_schema = chain.invoke({"data": data})["schema"]
 
         class InferredSchema(BaseModel):
             first_name: str

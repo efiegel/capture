@@ -22,9 +22,9 @@ class Agent:
         response = chain.invoke(inputs)
         return response.get("updated_content")
 
-    def infer_csv_schema(self, csv_data: str) -> Type[BaseModel]:
+    def infer_csv_schema(self, data: str) -> Type[BaseModel]:
         chain = SchemaInferenceChain(model=self.model)
-        response = chain.invoke({"csv_data": csv_data})
+        response = chain.invoke({"data": data})
         return response.get("schema")
 
     def select_file(self, directory: str, content: str) -> str:
