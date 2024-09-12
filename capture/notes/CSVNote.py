@@ -1,26 +1,20 @@
 import csv
-from itertools import islice
+import os
 
-from pydantic import BaseModel
+from .BaseNote import BaseNote
 
 
-class CSVNote:
-    def __init__(self, path: str):
-        self.path = path
+class CSVNote(BaseNote[list[list[str]]]):
+    def read(self) -> list[list[str]]:
+        if not os.path.exists(self.file_path):
+            return [[]]
 
-    def add_entries(self, entries: list[BaseModel]):
-        with open(self.path, mode="a", newline="") as file:
-            writer = csv.writer(file)
-            for entry in entries:
-                writer.writerow(list(entry.model_dump().values()))
-
-    def write_headers(self, headers: list[str]):
-        with open(self.path, mode="a", newline="") as file:
-            writer = csv.writer(file)
-            writer.writerow(headers)
-
-    def get_first_n_lines(self, n: int):
-        with open(self.path, mode="r", newline="") as file:
+        with open(self.file_path, newline="") as file:
             reader = csv.reader(file)
-            lines = list(islice(reader, n))
-        return lines
+            return list(reader)
+
+    def write(self, content: list[list[str]], append: bool = True):
+        mode = "a" if append else "w"
+        with open(self.file_path, mode, newline="") as file:
+            writer = csv.writer(file)
+            writer.writerows(content)

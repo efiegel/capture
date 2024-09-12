@@ -1,3 +1,5 @@
+from typing import Optional
+
 from langchain.chains.base import Chain
 from langchain_core.prompts import PromptTemplate
 from langchain_openai import ChatOpenAI
@@ -10,26 +12,27 @@ class SchemaInferenceChain(Chain):
     @property
     def chain(self):
         system_message = """
-        You are an expert in data analysis and schema inference. You will be provided 
-        with the first few rows of a CSV file. It's possible that you might actually
-        instead be passed a whole block of text that will eventally be written to a CSV.
-        If that is the case, pull out the relevant pieces of data that would be written 
-        to the CSV and ignore extraneous language describing the event or file itself. 
-        Your ultimate task is to infer the schema of the CSV and return it in exactly 
-        this format: 'field_name: field_type, field_name: field_type, ...'. All names 
-        should be snake case. Types should be one of 'str', 'int', 'float', 'bool'. 
-        Return only the schema, nothing else.
+        You are an expert in data analysis and schema inference. You will be provided
+        data that needs to be understood and converted into a schema for a CSV file. The
+        data may be the first few rows of a CSV file itself or a block of text that will
+        be parsed later and then written to a CSV. If you are given a block of text, 
+        pull out the relevant pieces of data that would be written to the CSV and ignore 
+        extraneous language describing the event or file itself. Your ultimate task is 
+        to infer the schema of the final CSV file and return it in exactly this format: 
+        'field_name: field_type, field_name: field_type, ...'. All names should be snake
+        case. Types should be one of 'str', 'int', 'float', 'bool'. Return only the 
+        schema, nothing else.
         """
 
         template = """
         {system_message}
-        CSV data:
-        {csv_data}
+        Data:
+        {data}
         """
 
         prompt = PromptTemplate(
             template=template,
-            input_variables=["csv_data"],
+            input_variables=["data"],
             partial_variables={"system_message": system_message},
         )
 
@@ -37,7 +40,7 @@ class SchemaInferenceChain(Chain):
 
     @property
     def input_keys(self) -> list[str]:
-        return ["csv_data"]
+        return ["data"]
 
     @property
     def output_keys(self) -> list[str]:
@@ -60,7 +63,7 @@ class SchemaInferenceChain(Chain):
         schema_dict = {}
         for field in schema_string.replace(" ", "").split(","):
             name, type_str = field.split(":")
-            field_type = type_mapping.get(type_str)
+            field_type = Optional[type_mapping.get(type_str)]
             schema_dict[name] = (field_type, ...)
 
         return schema_dict
