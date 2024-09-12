@@ -10,8 +10,8 @@ class BaseNote(ABC, Generic[T]):
 
     @abstractmethod
     def read(self) -> T:
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def write(self, content: T):
-        pass
+        raise NotImplementedError

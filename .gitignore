@@ -11,7 +11,8 @@
 *.db
 
 # Coverage reports
-.coverage*
+.coverage
+.coverage.*
 
 # macOS specific files
 .DS_Store
