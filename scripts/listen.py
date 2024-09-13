@@ -3,11 +3,16 @@ import subprocess
 import time
 
 import whisper
+from dotenv import load_dotenv
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
 
-from capture import settings
 from capture.vault import Vault
+
+load_dotenv()
+
+AUDIO_DIRECTORY = os.path.expanduser(os.getenv("AUDIO_DIRECTORY", ""))
+VAULT_DIRECTORY = os.path.expanduser(os.getenv("VAULT_DIRECTORY", ""))
 
 
 class M4AFileHandler(FileSystemEventHandler):
@@ -55,7 +60,7 @@ def add_to_vault(file):
     model = whisper.load_model("small")
     transcription = model.transcribe(file)["text"]
 
-    vault = Vault(settings.VAULT_DIRECTORY)
+    vault = Vault(VAULT_DIRECTORY)
     vault.add(transcription)
 
 
@@ -63,7 +68,7 @@ if __name__ == "__main__":
     max_recording_duration_seconds = 5 * 60
     event_handler = M4AFileHandler(add_to_vault, max_recording_duration_seconds)
     observer = Observer()
-    observer.schedule(event_handler, path=settings.AUDIO_DIRECTORY, recursive=False)
+    observer.schedule(event_handler, path=AUDIO_DIRECTORY, recursive=False)
     observer.start()
     try:
         while True:
