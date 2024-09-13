@@ -44,14 +44,3 @@ class M4AFileHandler(FileSystemEventHandler):
             return result.returncode == 0
         except Exception:
             return False
-
-
-class TextFileHandler(FileSystemEventHandler):
-    def __init__(self, on_created_callback) -> None:
-        super().__init__()
-        self.on_created_callback = on_created_callback
-
-    def on_created(self, event):
-        file = event.src_path
-        if file.endswith(".txt"):
-            self.on_created_callback(file)
