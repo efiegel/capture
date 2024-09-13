@@ -5,17 +5,25 @@ from capture.llm import Agent
 from capture.notes import BaseNote, CSVNote, TextNote
 
 
-class NotesService:
-    def __init__(self, notes_directory: str) -> None:
-        self.notes_directory = notes_directory
+class Vault:
+    def __init__(self, directory: str) -> None:
+        self.directory = directory
         self.agent = Agent("gpt-4o-mini")
 
-    def add_content_to_text_note(self, note: TextNote, content: str):
+    def add(self, content: str):
+        file = self.agent.select_file(self.directory, content)
+        note = self._get_or_init_note(file)
+        if isinstance(note, CSVNote):
+            self._add_to_csv_note(note, content)
+        else:
+            self._add_to_text_note(note, content)
+
+    def _add_to_text_note(self, note: TextNote, content: str):
         existing_content = note.read()
         updated_content = self.agent.integrate(existing_content, content)
         note.write(updated_content)
 
-    def add_content_to_csv_note(self, note: CSVNote, content: str):
+    def _add_to_csv_note(self, note: CSVNote, content: str):
         first_lines = note.read()[:5]
         schema = self.agent.infer_schema(first_lines or content)
         entries = self.agent.parse(content, list[schema])
@@ -30,11 +38,3 @@ class NotesService:
             return CSVNote(file_path)
         else:
             return TextNote(file_path)
-
-    def add_content(self, content: str):
-        file = self.agent.select_file(self.notes_directory, content)
-        note = self._get_or_init_note(file)
-        if isinstance(note, CSVNote):
-            self.add_content_to_csv_note(note, content)
-        else:
-            self.add_content_to_text_note(note, content)
