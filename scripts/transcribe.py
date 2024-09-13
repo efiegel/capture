@@ -5,17 +5,13 @@ from watchdog.observers import Observer
 
 from capture import settings
 from capture.audio import Audio
-from capture.db import database_context
 from scripts.event_handlers import M4AFileHandler
 
 
 def transcribe(file):
-    with database_context():
-        file_name = os.path.basename(file)
-        transcriber = Audio("tiny")
-        transcriber.transcribe(
-            file, f"{settings.TRANSCRIPTION_DIRECTORY}/{file_name}.txt"
-        )
+    file_name = os.path.basename(file)
+    transcriber = Audio("tiny")
+    transcriber.transcribe(file, f"{settings.TRANSCRIPTION_DIRECTORY}/{file_name}.txt")
 
 
 if __name__ == "__main__":
