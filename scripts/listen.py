@@ -12,7 +12,7 @@ def capture(file):
     model = whisper.load_model("small")
     transcription = model.transcribe(file)["text"]
 
-    vault = Vault(settings.NOTES_DIRECTORY)
+    vault = Vault(settings.VAULT_DIRECTORY)
     vault.add(transcription)
 
 
@@ -20,9 +20,7 @@ if __name__ == "__main__":
     max_recording_duration_seconds = 5 * 60
     event_handler = M4AFileHandler(capture, max_recording_duration_seconds)
     observer = Observer()
-    observer.schedule(
-        event_handler, path=settings.SOURCE_AUDIO_DIRECTORY, recursive=False
-    )
+    observer.schedule(event_handler, path=settings.AUDIO_DIRECTORY, recursive=False)
     observer.start()
     try:
         while True:
