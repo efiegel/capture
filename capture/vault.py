@@ -6,12 +6,12 @@ from capture.notes import BaseNote, CSVNote, TextNote
 
 
 class Vault:
-    def __init__(self, notes_directory: str) -> None:
-        self.notes_directory = notes_directory
+    def __init__(self, directory: str) -> None:
+        self.directory = directory
         self.agent = Agent("gpt-4o-mini")
 
     def add(self, content: str):
-        file = self.agent.select_file(self.notes_directory, content)
+        file = self.agent.select_file(self.directory, content)
         note = self._get_or_init_note(file)
         if isinstance(note, CSVNote):
             self._add_to_csv_note(note, content)
