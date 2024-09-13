@@ -6,6 +6,12 @@ brew install ffmpeg
 ```
 
 ## Use
+To add text via command line:
 ```
-./run.sh
+python -m scripts.capture
+```
+
+To transcribe and add audio content:
+```
+python -m scripts.listen
 ```
