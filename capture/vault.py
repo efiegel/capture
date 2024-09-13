@@ -5,7 +5,7 @@ from capture.llm import Agent
 from capture.notes import BaseNote, CSVNote, TextNote
 
 
-class NotesService:
+class Vault:
     def __init__(self, notes_directory: str) -> None:
         self.notes_directory = notes_directory
         self.agent = Agent("gpt-4o-mini")

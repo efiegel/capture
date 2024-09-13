@@ -4,7 +4,7 @@ import whisper
 from watchdog.observers import Observer
 
 from capture import settings
-from capture.notes.notes_service import NotesService
+from capture.vault import Vault
 from scripts.event_handlers import M4AFileHandler
 
 
@@ -12,8 +12,8 @@ def capture(file):
     model = whisper.load_model("small")
     transcription = model.transcribe(file)["text"]
 
-    notes = NotesService(settings.NOTES_DIRECTORY)
-    notes.add_content(transcription)
+    vault = Vault(settings.NOTES_DIRECTORY)
+    vault.add_content(transcription)
 
 
 if __name__ == "__main__":
