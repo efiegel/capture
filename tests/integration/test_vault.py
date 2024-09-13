@@ -54,10 +54,10 @@ class TestVault:
         daily_note = f"{tmp_path}/daily_notes/{datetime.now().strftime('%Y-%m-%d')}.md"
         assert os.path.exists(daily_note) is False
 
-        notes_service = Vault(tmp_path)
+        vault = Vault(tmp_path)
         integrated_content = "This is a sample note.\n\nMore content!"
         with patch_model_responses([daily_note, integrated_content]):
-            notes_service.add_content("New content for a new note!")
+            vault.add("New content for a new note!")
 
         with open(daily_note, "r") as f:
             content = f.read()
@@ -69,7 +69,7 @@ class TestVault:
         vault = Vault(tmp_path)
         integrated_content = "This is a sample note.\n\nMore content!"
         with patch_model_responses([daily_note, integrated_content]):
-            vault.add_content("More content!")
+            vault.add("More content!")
 
         with open(daily_note, "r") as f:
             content = f.read()
@@ -103,7 +103,7 @@ class TestVault:
         # and mock the entire thing if desired, this is all a product of the | syntax.
         with patch_model_responses([food_log, schema_str, None]):
             with patch_json_parsing({"items": entry_list}):
-                vault.add_content("I ate an apple at lunch.")
+                vault.add("I ate an apple at lunch.")
 
         with open(food_log, mode="r", newline="") as f:
             reader = csv.reader(f)
@@ -123,9 +123,7 @@ class TestVault:
 
         with patch_model_responses([new_file_path, schema_str, None]):
             with patch_json_parsing({"items": entry_list}):
-                vault.add_content(
-                    "New sleep log! Went to bed at 10pm and woke up at 6am."
-                )
+                vault.add("New sleep log! Went to bed at 10pm and woke up at 6am.")
 
         with open(new_file_path, mode="r", newline="") as f:
             reader = csv.reader(f)

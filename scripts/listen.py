@@ -13,7 +13,7 @@ def capture(file):
     transcription = model.transcribe(file)["text"]
 
     vault = Vault(settings.NOTES_DIRECTORY)
-    vault.add_content(transcription)
+    vault.add(transcription)
 
 
 if __name__ == "__main__":
