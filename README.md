@@ -42,4 +42,4 @@ VAULT_DIRECTORY=your-vault-path
 This tool will write content directly to your files, so adding version control to your notes directory is strongly advised. Obsidian users can reference [obsidian-git](https://github.com/Vinzent03/obsidian-git).
 
 ### Manually editing notes
-Continue to manually edit your notes as you otherwise would! Capture doesn't keep state, so it won't be thrown off if you interleave automated additions with manual ones.
+Continue to manually edit your notes as you otherwise would! Capture doesn't keep state, so it won't be thrown off if you interleave it's automated additions with manual ones.
