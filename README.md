@@ -13,17 +13,27 @@ python -m scripts.listen
 ```
 
 ## Setup
-Audio transcription requires ffmpeg.
+### Dependencies
+Audio transcription requires ffmpeg:
 ```
 brew install ffmpeg
 ```
 
-### Environment
-Create an `.env` file and assign values for the following:
+Install python packages with [pipenv](https://pipenv.pypa.io/en/latest/):
 ```
-AUDIO_DIRECTORY=
-OPENAI_API_KEY=
-VAULT_DIRECTORY=
+pip install pipenv
+pipenv shell
+pipenv install
+```
+
+### Environment
+This tool requires an [OpenAI API key](https://platform.openai.com/api-keys).
+
+Create an `.env` file as follows:
+```
+AUDIO_DIRECTORY=~/Library/Application Support/com.apple.voicememos/Recordings
+OPENAI_API_KEY=your-api-key
+VAULT_DIRECTORY=your-vault-path
 ```
 
 
