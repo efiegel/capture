@@ -108,7 +108,7 @@ class TestVault:
         with open(food_log, mode="r", newline="") as f:
             reader = csv.reader(f)
             next(reader)  # skip header
-            entries = [row for row in reader]
+            entries = list(reader)
 
         assert entries[1] == (
             ["12:00", "apple", "1.0", "whole", "95.0", "0.5", "0.3", "25.0", "2.0"]
@@ -127,7 +127,7 @@ class TestVault:
 
         with open(new_file_path, mode="r", newline="") as f:
             reader = csv.reader(f)
-            entries = [row for row in reader]
+            entries = list(reader)
 
         assert entries == [
             ["asleep", "awake"],
