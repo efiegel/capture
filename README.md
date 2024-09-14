@@ -1,5 +1,5 @@
 # Capture
-An aid for plain text note management. Intended for use with tools like [Obsidian](https://obsidian.md/).
+An aide for plain text note management. Intended for use with tools like [Obsidian](https://obsidian.md/).
 
 **Quick-capture cli**
 ```
