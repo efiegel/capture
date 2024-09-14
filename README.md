@@ -6,7 +6,7 @@ brew install ffmpeg
 ```
 
 ### Environment
-Create an `.env` file and assign values for the following
+Create an `.env` file and assign values for the following:
 ```
 AUDIO_DIRECTORY=
 OPENAI_API_KEY=
