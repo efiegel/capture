@@ -11,8 +11,7 @@ from capture.notes import BaseNote, CSVNote, TextNote
 class Vault:
     def __init__(self, directory: str) -> None:
         self.directory = directory
-        self.dot_dir = os.path.join(self.directory, ".capture")
-        self._init_dot_dir()
+        self.dot_dir = self._get_or_init_dot_dir()
         self.agent = Agent(
             "gpt-4o-mini",
             vectorstore=Chroma(
@@ -21,9 +20,11 @@ class Vault:
             ),
         )
 
-    def _init_dot_dir(self):
-        if not os.path.exists(self.dot_dir):
-            os.makedirs(self.dot_dir)
+    def _get_or_init_dot_dir(self):
+        dir = os.path.join(self.directory, ".capture")
+        if not os.path.exists(dir):
+            os.makedirs(dir)
+        return dir
 
     def add(self, content: str):
         file = self.agent.select_file(self.directory, content)
