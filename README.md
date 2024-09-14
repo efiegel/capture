@@ -12,6 +12,7 @@ add to vault: start a new csv workout log and add that I went on a 2 mile run to
 ```
 python -m scripts.listen
 ```
+![Obsidian screenshot: updated book note](docs/images/obsidian_screenshot_updated_note.png)
 
 ## Setup
 ### Dependencies
