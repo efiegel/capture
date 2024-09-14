@@ -1,6 +1,7 @@
 import os
 from typing import List, Type, Union
 
+from langchain_chroma import Chroma
 from langchain_openai import ChatOpenAI
 from pydantic import BaseModel, create_model
 
@@ -13,8 +14,9 @@ from .chains import (
 
 
 class Agent:
-    def __init__(self, model_name: str):
+    def __init__(self, model_name: str, vectorstore: Chroma):
         self.model = ChatOpenAI(model=model_name)
+        self.vectorstore = vectorstore
 
     def integrate(self, existing_content: str, new_content: str):
         chain = IntegratorChain(model=self.model)
@@ -42,11 +44,19 @@ class Agent:
         response_format: Union[Type[BaseModel], Type[list[BaseModel]]],
     ):
         if response_format.__class__ == BaseModel.__class__:
-            chain = ParserChain(model=self.model, response_format=response_format)
+            chain = ParserChain(
+                model=self.model,
+                response_format=response_format,
+                vectorstore=self.vectorstore,
+            )
             return chain.invoke({"content": content}).get("parsed_content")
         else:
             items_model = self._create_items_model(response_format)
-            chain = ParserChain(model=self.model, response_format=items_model)
+            chain = ParserChain(
+                model=self.model,
+                response_format=items_model,
+                vectorstore=self.vectorstore,
+            )
             return chain.invoke({"content": content}).get("parsed_content").items
 
     @staticmethod

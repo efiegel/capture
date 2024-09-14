@@ -1,6 +1,8 @@
 from unittest.mock import MagicMock
 
 import pytest
+from langchain_chroma import Chroma
+from langchain_openai import OpenAIEmbeddings
 from pydantic import BaseModel
 
 from capture.llm import Agent
@@ -17,8 +19,12 @@ class TestAgent:
         return Model
 
     @pytest.fixture()
-    def agent(self):
-        return Agent(model_name="gpt-4o-mini")
+    def vectorstore(self):
+        return Chroma(embedding_function=OpenAIEmbeddings())
+
+    @pytest.fixture()
+    def agent(self, vectorstore):
+        return Agent(model_name="gpt-4o-mini", vectorstore=vectorstore)
 
     def test_parse_per_model(self, agent, response_model):
         parsed_result_dict = {"attr1": "1", "attr2": 2}

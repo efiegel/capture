@@ -3,21 +3,21 @@ from unittest.mock import Mock, patch
 from langchain_openai import OpenAIEmbeddings
 
 from capture.llm.rag import format_docs, load_csv_data
-from capture.settings import VECTORSTORE_PATH
 
 
 class TestRAG:
     def test_load_csv_data_calls_chroma_correctly(self):
         docs = []
+        vectorstore_path = ""
         loader = "langchain_community.document_loaders.csv_loader.CSVLoader.load"
         with patch(loader, return_value=docs):
             with patch("langchain_chroma.Chroma.from_documents") as chroma_mock:
-                load_csv_data("")
+                load_csv_data("", vectorstore_path)
 
         chroma_mock.assert_called_once_with(
             documents=docs,
             embedding=OpenAIEmbeddings(),
-            persist_directory=VECTORSTORE_PATH,
+            persist_directory=vectorstore_path,
         )
 
     def test_format_docs(self):

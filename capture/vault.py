@@ -1,6 +1,9 @@
 import os
 from pathlib import Path
 
+from langchain_chroma import Chroma
+from langchain_openai import OpenAIEmbeddings
+
 from capture.llm import Agent
 from capture.notes import BaseNote, CSVNote, TextNote
 
@@ -8,7 +11,20 @@ from capture.notes import BaseNote, CSVNote, TextNote
 class Vault:
     def __init__(self, directory: str) -> None:
         self.directory = directory
-        self.agent = Agent("gpt-4o-mini")
+        self.dot_dir = self._get_or_init_dot_dir()
+        self.agent = Agent(
+            "gpt-4o-mini",
+            vectorstore=Chroma(
+                persist_directory=os.path.join(self.dot_dir, ".chroma"),
+                embedding_function=OpenAIEmbeddings(),
+            ),
+        )
+
+    def _get_or_init_dot_dir(self):
+        dir = os.path.join(self.directory, ".capture")
+        if not os.path.exists(dir):
+            os.makedirs(dir)
+        return dir
 
     def add(self, content: str):
         file = self.agent.select_file(self.directory, content)
