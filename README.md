@@ -6,6 +6,7 @@ An aid for plain text note management. Intended for use with tools like [Obsidia
 python -m scripts.capture
 add to vault: start a new csv workout log and add that I went on a 2 mile run today
 ```
+![Obsidian screenshot: new csv log](docs/images/obsidian_screenshot_workout_log.png)
 
 **Integrate transcribed audio**
 ```
