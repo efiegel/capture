@@ -1,6 +1,6 @@
 import os
 
-from .BaseNote import BaseNote
+from .base_note import BaseNote
 
 
 class TextNote(BaseNote[str]):

@@ -1,10 +1,10 @@
 from datetime import datetime
 from typing import Type
+from langchain_core.prompts import PromptTemplate
 
+from langchain_chroma import Chroma
 from langchain.chains.base import Chain
 from langchain.output_parsers import PydanticOutputParser
-from langchain_chroma import Chroma
-from langchain_core.prompts import PromptTemplate
 from langchain_openai import ChatOpenAI
 from pydantic import BaseModel
 

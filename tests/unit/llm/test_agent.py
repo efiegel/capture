@@ -42,4 +42,4 @@ class TestAgent:
                 content = MagicMock()
                 response_format = list[response_model]
                 expected_output = [response_model(**parsed_result_dict)]
-                agent.parse(content, response_format) == expected_output
+                assert agent.parse(content, response_format) == expected_output
