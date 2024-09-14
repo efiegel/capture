@@ -3,16 +3,18 @@ from typing import Type
 
 from langchain.chains.base import Chain
 from langchain.output_parsers import PydanticOutputParser
+from langchain_chroma import Chroma
 from langchain_core.prompts import PromptTemplate
 from langchain_openai import ChatOpenAI
 from pydantic import BaseModel
 
-from capture.llm.rag import format_docs, vectorstore
+from capture.llm.rag import format_docs
 
 
 class ParserChain(Chain):
     model: ChatOpenAI
     response_format: Type[BaseModel]
+    vectorstore: Chroma
 
     @property
     def chain(self):
@@ -38,7 +40,7 @@ class ParserChain(Chain):
             partial_variables={
                 "system_message": system_message,
                 "format_instructions": parser.get_format_instructions(),
-                "context": vectorstore.as_retriever() | format_docs,
+                "context": self.vectorstore.as_retriever() | format_docs,
             },
         )
 
