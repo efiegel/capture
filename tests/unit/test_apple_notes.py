@@ -1,3 +1,4 @@
+from markdownify import markdownify as md
 from ScriptingBridge import SBApplication
 
 
@@ -22,5 +23,6 @@ def test_apple_notes():
         print("id:", latest_note.id())
         print("name:", latest_note.name())
         print("body:", latest_note.body())
+        print("body as markdown:", md(latest_note.body()))
         print("creation date:", latest_note.creationDate())
         print("modification date:", latest_note.modificationDate())
