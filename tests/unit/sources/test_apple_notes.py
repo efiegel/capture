@@ -20,27 +20,16 @@ class TestAppleNotes:
             mock_sb_application.applicationWithBundleIdentifier_.return_value = app
             folder_name = "folder_name"
             a_notes = AppleNotes(folder_name)
-            with patch.object(app, "accounts", return_value=[account]):
-                with patch.object(account, "name", return_value=a_notes.account_name):
-                    with patch.object(account, "folders", return_value=[folder]):
-                        with patch.object(folder, "name", return_value=folder_name):
-                            with patch.object(folder, "notes", return_value=[note]):
-                                with patch.object(note, "id", return_value="id"):
-                                    with patch.object(
-                                        note, "name", return_value="title"
-                                    ):
-                                        with patch.object(
-                                            note, "body", return_value="content"
-                                        ):
-                                            with patch.object(
-                                                note,
-                                                "creationDate",
-                                                return_value="2021-01-01",
-                                            ):
-                                                with patch.object(
-                                                    note,
-                                                    "modificationDate",
-                                                    return_value="2021-01-02",
-                                                ):
-                                                    note = next(a_notes.note_iterator())
-                                                    assert note == mock_note
+            # fmt: off
+            with patch.object(app, "accounts", return_value=[account]), \
+                 patch.object(account, "name", return_value=a_notes.account_name), \
+                 patch.object(account, "folders", return_value=[folder]), \
+                 patch.object(folder, "name", return_value=folder_name), \
+                 patch.object(folder, "notes", return_value=[note]), \
+                 patch.object(note, "id", return_value="id"), \
+                 patch.object(note, "name", return_value="title"), \
+                 patch.object(note, "body", return_value="content"), \
+                 patch.object(note,"creationDate",return_value="2021-01-01"), \
+                 patch.object(note,"modificationDate", return_value="2021-01-02"):
+                # fmt: on
+                assert next(a_notes.note_iterator()) == mock_note
