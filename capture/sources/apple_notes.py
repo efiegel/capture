@@ -17,7 +17,7 @@ class AppleNote:
 class AppleNotes:
     def __init__(
         self,
-        apple_notes_app: SBApplication,
+        apple_notes_app: "SBApplication",
         folder_name: str,
         account_name: str = "iCloud",
     ) -> None:
