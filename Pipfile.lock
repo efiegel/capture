@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "c4fa5d81d1291fbe32c74f46de8ed7c690f5c80f69d331e049f77eb815247181"
+            "sha256": "f409ea591f107cc57643c0efc1c8ed8bc31a0adaf7fcc8a50445c6515487835b"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -836,7 +836,7 @@
                 "sha256:2b5f86c1101beb013cb264c5722ad21931641493b4dc86e6f0575da698bf5cff",
                 "sha256:67e5510559454f3f7a0526e7ef91fd0f12b45c0cdc70720e44909f62b5becf5a"
             ],
-            "markers": "python_version >= '3.9'",
+            "markers": "python_version >= '3.9' and python_version < '4.0'",
             "version": "==0.3.5"
         },
         "langchain-openai": {
@@ -1293,7 +1293,7 @@
                 "sha256:f870204a840a60da0b12273ef34f7051e98c3b5961b61b0c2c1be6dfd64fbcd3",
                 "sha256:ffa75af20b44f8dba823498024771d5ac50620e6915abac414251bd971b4529f"
             ],
-            "markers": "python_version >= '3.9'",
+            "markers": "python_version < '3.12'",
             "version": "==1.26.4"
         },
         "oauthlib": {
@@ -1693,7 +1693,7 @@
                 "sha256:a7151186bb7805deea434fae9a4423335e6371d105f29e73cc2036c6779a9dbc",
                 "sha256:de5e62e5ccf2871a94acf3bf79646b20ea893cc9db78afa8d1fe1b0d0f7cbdb0"
             ],
-            "markers": "python_version >= '3.8'",
+            "markers": "sys_platform == 'darwin'",
             "version": "==10.3.1"
         },
         "pyobjc-framework-scriptingbridge": {
