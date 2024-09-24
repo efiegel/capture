@@ -1,6 +1,7 @@
 import os
 
 from dotenv import load_dotenv
+from markdownify import markdownify as md
 from ScriptingBridge import SBApplication
 
 from capture.sources.apple_notes import AppleNotes
@@ -24,4 +25,5 @@ if __name__ == "__main__":
         if user_input == "n":
             break
 
-        vault.add(note.content)
+        markdown = md(note.content)
+        vault.add(markdown)
