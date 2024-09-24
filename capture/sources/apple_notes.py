@@ -1,5 +1,8 @@
 from dataclasses import dataclass
-from typing import Iterator
+from typing import TYPE_CHECKING, Iterator
+
+if TYPE_CHECKING:
+    from ScriptingBridge import SBApplication
 
 
 @dataclass
@@ -13,11 +16,14 @@ class AppleNote:
 
 class AppleNotes:
     def __init__(
-        self, apple_notes_app, folder_name: str, account_name: str = "iCloud"
+        self,
+        apple_notes_app: SBApplication,
+        folder_name: str,
+        account_name: str = "iCloud",
     ) -> None:
+        self.apple_notes_app = apple_notes_app
         self.folder_name = folder_name
         self.account_name = account_name
-        self.apple_notes_app = apple_notes_app
 
     def note_iterator(self) -> Iterator[AppleNote]:
         for note in self._get_notes():
