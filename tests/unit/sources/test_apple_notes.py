@@ -8,6 +8,7 @@ class TestAppleNotes:
         folder, notes = MagicMock(), [MagicMock()]
         mock_note = AppleNote(
             id="id",
+            title="title",
             content="content",
             creation_date="2021-01-01",
             modification_date="2021-01-02",

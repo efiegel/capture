@@ -7,6 +7,7 @@ from ScriptingBridge import SBApplication
 @dataclass
 class AppleNote:
     id: str
+    title: str
     content: str
     creation_date: str
     modification_date: str
@@ -33,6 +34,7 @@ class AppleNotes:
     def _convert_to_dataclass(self, note) -> AppleNote:
         return AppleNote(
             id=note.id(),
+            title=note.name(),
             content=note.body(),
             creation_date=note.creationDate(),
             modification_date=note.modificationDate(),
