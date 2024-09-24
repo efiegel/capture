@@ -1,6 +1,7 @@
 import os
 
 from dotenv import load_dotenv
+from ScriptingBridge import SBApplication
 
 from capture.sources.apple_notes import AppleNotes
 from capture.vault import Vault
@@ -12,7 +13,8 @@ VAULT_DIRECTORY = os.path.expanduser(os.getenv("VAULT_DIRECTORY", ""))
 
 if __name__ == "__main__":
     vault = Vault(VAULT_DIRECTORY)
-    apple_notes_source = AppleNotes("capture")
+    apple_notes_app = SBApplication.applicationWithBundleIdentifier_("com.apple.Notes")
+    apple_notes_source = AppleNotes(apple_notes_app, "capture")
     for note in apple_notes_source.note_iterator():
         print("-" * 40)
         print(f"title: {note.title}")
