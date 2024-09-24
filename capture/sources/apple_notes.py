@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Iterator
 
 if TYPE_CHECKING:
-    from ScriptingBridge import SBApplication
+    from ScriptingBridge import SBApplication  # pragma: no cover
 
 
 @dataclass
