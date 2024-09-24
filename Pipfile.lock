@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "ddd6bae2e5c4d2c47c7b4e186123dbfc3feabe291e8ea83fa655d2ef9ce7ecfe"
+            "sha256": "ff8c617ec24a68d496444c3a89be1b38fd726603ac69e9c30ff1ece66f17f15b"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -836,7 +836,7 @@
                 "sha256:2b5f86c1101beb013cb264c5722ad21931641493b4dc86e6f0575da698bf5cff",
                 "sha256:67e5510559454f3f7a0526e7ef91fd0f12b45c0cdc70720e44909f62b5becf5a"
             ],
-            "markers": "python_version >= '3.9'",
+            "markers": "python_version >= '3.9' and python_version < '4.0'",
             "version": "==0.3.5"
         },
         "langchain-openai": {
@@ -1293,7 +1293,7 @@
                 "sha256:f870204a840a60da0b12273ef34f7051e98c3b5961b61b0c2c1be6dfd64fbcd3",
                 "sha256:ffa75af20b44f8dba823498024771d5ac50620e6915abac414251bd971b4529f"
             ],
-            "markers": "python_version < '3.12'",
+            "markers": "python_version >= '3.9'",
             "version": "==1.26.4"
         },
         "oauthlib": {
@@ -1704,7 +1704,7 @@
                 "sha256:6bfb45efd0a1cda38a37154afe69f86ea086d5cbdfbc33b3e31c0bda97537fe9",
                 "sha256:90022f44f2bf0563bf5a75669198b9d778f76ece719f237750e9c5fcb00a601d"
             ],
-            "markers": "sys_platform == 'darwin'",
+            "markers": "python_version >= '3.8' and sys_platform == 'darwin'",
             "version": "==10.3.1"
         },
         "pypika": {

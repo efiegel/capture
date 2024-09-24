@@ -17,7 +17,7 @@ langchain = "*"
 langchain-openai = "*"
 langchain-community = "*"
 langchain-chroma = "*"
-pyobjc-framework-scriptingbridge = {version = "*", markers = "sys_platform == 'darwin'"}
+pyobjc-framework-scriptingbridge = {version = "*", sys_platform = "== 'darwin'"}
 markdownify = "*"
 
 [requires]
