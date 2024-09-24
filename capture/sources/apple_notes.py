@@ -22,16 +22,10 @@ class AppleNotes:
         )
 
     def note_iterator(self) -> Iterator[AppleNote]:
-        if (folder := self._get_folder()) is None:
-            return iter([])
+        for note in self._get_notes():
+            yield self._convert_raw_note_to_dataclass(note)
 
-        if (notes := folder.notes()) is None:
-            return iter([])
-
-        for note in notes:
-            yield self._convert_to_dataclass(note)
-
-    def _convert_to_dataclass(self, note) -> AppleNote:
+    def _convert_raw_note_to_dataclass(self, note) -> AppleNote:
         return AppleNote(
             id=note.id(),
             title=note.name(),
@@ -40,11 +34,11 @@ class AppleNotes:
             modification_date=note.modificationDate(),
         )
 
-    def _get_folder(self):
+    def _get_notes(self):
         for account in self.apple_notes_app.accounts():
             if account.name() == self.account_name:
                 folders = account.folders()
                 for folder in folders:
                     if folder.name() == self.folder_name:
-                        return folder
-        return None
+                        return folder.notes()
+        return []
