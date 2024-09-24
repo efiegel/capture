@@ -20,16 +20,10 @@ class AppleNotesSource:
         )
 
     def get_notes(self):
-        notes = []
-        for account in self.apple_notes_app.accounts():
-            if account.name() == self.account_name:
-                folders = account.folders()
-                for folder in folders:
-                    if folder.name() == self.folder_name:
-                        notes = folder.notes()
-                        break
-                break
+        if (folder := self._get_folder()) is None:
+            return []
 
+        notes = folder.notes()
         return [
             SourceContent(
                 id=note.id(),
@@ -39,3 +33,12 @@ class AppleNotesSource:
             )
             for note in notes
         ]
+
+    def _get_folder(self):
+        for account in self.apple_notes_app.accounts():
+            if account.name() == self.account_name:
+                folders = account.folders()
+                for folder in folders:
+                    if folder.name() == self.folder_name:
+                        return folder
+        return None
