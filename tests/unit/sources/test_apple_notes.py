@@ -25,9 +25,22 @@ class TestAppleNotes:
                     with patch.object(account, "folders", return_value=[folder]):
                         with patch.object(folder, "name", return_value=folder_name):
                             with patch.object(folder, "notes", return_value=[note]):
-                                with patch.object(
-                                    a_notes,
-                                    "_convert_raw_note_to_dataclass",
-                                    return_value=mock_note,
-                                ):
-                                    assert next(a_notes.note_iterator()) == mock_note
+                                with patch.object(note, "id", return_value="id"):
+                                    with patch.object(
+                                        note, "name", return_value="title"
+                                    ):
+                                        with patch.object(
+                                            note, "body", return_value="content"
+                                        ):
+                                            with patch.object(
+                                                note,
+                                                "creationDate",
+                                                return_value="2021-01-01",
+                                            ):
+                                                with patch.object(
+                                                    note,
+                                                    "modificationDate",
+                                                    return_value="2021-01-02",
+                                                ):
+                                                    note = next(a_notes.note_iterator())
+                                                    assert note == mock_note
