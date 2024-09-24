@@ -1,5 +1,7 @@
 from unittest.mock import MagicMock, patch
 
+import pytest
+
 from capture.sources.apple_notes import AppleNote, AppleNotes
 
 
@@ -33,3 +35,12 @@ class TestAppleNotes:
                  patch.object(note,"modificationDate", return_value="2021-01-02"):
                 # fmt: on
                 assert next(a_notes.note_iterator()) == mock_note
+
+    def test_note_iterator_raises_stopiteration_if_empty(self):
+        app = MagicMock()
+        with patch("capture.sources.apple_notes.SBApplication") as mock_sb_application:
+            mock_sb_application.applicationWithBundleIdentifier_.return_value = app
+            apple_notes = AppleNotes("folder_name")
+            with patch.object(app, "accounts", return_value=[]):
+                with pytest.raises(StopIteration):
+                    next(apple_notes.note_iterator())
