@@ -1,6 +1,4 @@
-from unittest.mock import Mock, patch
-
-from langchain_openai import OpenAIEmbeddings
+from unittest.mock import MagicMock, Mock, patch
 
 from capture.llm.rag import format_docs, load_csv_data
 
@@ -10,13 +8,18 @@ class TestRAG:
         docs = []
         vectorstore_path = ""
         loader = "langchain_community.document_loaders.csv_loader.CSVLoader.load"
+        embeddings_mock = MagicMock()
         with patch(loader, return_value=docs):
             with patch("langchain_chroma.Chroma.from_documents") as chroma_mock:
-                load_csv_data("", vectorstore_path)
+                with patch(
+                    "capture.llm.rag.OpenAIEmbeddings",
+                    return_value=embeddings_mock,
+                ):
+                    load_csv_data("", vectorstore_path)
 
         chroma_mock.assert_called_once_with(
             documents=docs,
-            embedding=OpenAIEmbeddings(),
+            embedding=embeddings_mock,
             persist_directory=vectorstore_path,
         )
 
