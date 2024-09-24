@@ -1,12 +1,12 @@
 from unittest.mock import MagicMock, patch
 
-from ScriptingBridge import SBApplication
-
 from capture.sources.apple_notes import AppleNote, AppleNotes
 
 
 class TestAppleNotes:
     def test_note_iterator(self):
+        "SBApplication is very arduous to mock. Necessary, but leads to an ugly test."
+
         app, account, folder, note = MagicMock(), MagicMock(), MagicMock(), MagicMock()
         mock_note = AppleNote(
             id="id",
@@ -16,9 +16,8 @@ class TestAppleNotes:
             modification_date="2021-01-02",
         )
 
-        with patch.object(
-            SBApplication, "applicationWithBundleIdentifier_", return_value=app
-        ):
+        with patch("capture.sources.apple_notes.SBApplication") as mock_sb_application:
+            mock_sb_application.applicationWithBundleIdentifier_.return_value = app
             folder_name = "folder_name"
             a_notes = AppleNotes(folder_name)
             with patch.object(app, "accounts", return_value=[account]):
