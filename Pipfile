@@ -17,6 +17,8 @@ langchain = "*"
 langchain-openai = "*"
 langchain-community = "*"
 langchain-chroma = "*"
+pyobjc-framework-scriptingbridge = {version = "*", markers = "sys_platform== 'darwin'"}
+pyobjc-framework-cocoa = {version = "*", markers = "sys_platform== 'darwin'"}
 
 [requires]
 python_version = "3.11"

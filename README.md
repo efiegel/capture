@@ -14,6 +14,19 @@ python -m scripts.listen
 ```
 ![Obsidian screenshot: updated book note](docs/images/obsidian_screenshot_updated_note.png)
 
+**Fetch from Apple Notes**
+```
+python -m scripts.fetch_apple_notes
+----------------------------------------
+title: Reading notes
+created at: 2024-09-24 13:59:11 +0000
+  >> add to vault? (y/n) [y]: 
+----------------------------------------
+title: Work thoughts
+created at: 2024-09-24 13:59:48 +0000
+  >> add to vault? (y/n) [y]: 
+```
+
 ## Setup
 ### Dependencies
 Audio transcription requires ffmpeg:

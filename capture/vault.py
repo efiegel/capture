@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 
 from langchain_chroma import Chroma
-from langchain_openai import OpenAIEmbeddings
+from langchain_community.embeddings import OpenAIEmbeddings
 
 from capture.llm import Agent
 from capture.notes import BaseNote, CSVNote, TextNote
