@@ -1,4 +1,5 @@
 import os
+import subprocess
 
 from dotenv import load_dotenv
 from ScriptingBridge import SBApplication
@@ -9,6 +10,11 @@ from capture.vault import Vault
 load_dotenv()
 
 VAULT_DIRECTORY = os.path.expanduser(os.getenv("VAULT_DIRECTORY", ""))
+
+
+def close_notes_app():
+    script = 'tell application "Notes" to quit'
+    subprocess.run(["osascript", "-e", script])
 
 
 if __name__ == "__main__":
@@ -26,3 +32,4 @@ if __name__ == "__main__":
             break
 
         vault.add(note)
+    close_notes_app()
