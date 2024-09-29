@@ -17,7 +17,15 @@ def close_notes_app():
     subprocess.run(["osascript", "-e", script])
 
 
+def notes_is_open():
+    script = 'tell application "System Events" to (name of processes) contains "Notes"'
+    result = subprocess.run(["osascript", "-e", script], capture_output=True, text=True)
+    return result.stdout.strip() == "true"
+
+
 if __name__ == "__main__":
+    close_notes_when_done = True if not notes_is_open() else False
+
     vault = Vault(VAULT_DIRECTORY)
     apple_notes_app = SBApplication.applicationWithBundleIdentifier_("com.apple.Notes")
     apple_notes_source = AppleNotes(apple_notes_app, "capture")
@@ -32,4 +40,6 @@ if __name__ == "__main__":
             break
 
         vault.add(note)
-    close_notes_app()
+
+    if close_notes_when_done:
+        close_notes_app()
