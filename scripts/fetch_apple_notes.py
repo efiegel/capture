@@ -19,6 +19,7 @@ if __name__ == "__main__":
         print("-" * 40)
         print(f"title: {note.title}")
         print(f"created at: {note.creation_date}")
+        print(f"modified at: {note.modification_date}")
 
         user_input = input("  >> add to vault? (y/n) [y]: ").strip().lower() or "y"
         if user_input == "n":
